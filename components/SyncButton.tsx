@@ -8,7 +8,7 @@ interface Result {
   results: { institution: string; added: number; error?: string }[];
 }
 
-export default function SyncButton() {
+export default function SyncButton({ compact = false }: { compact?: boolean }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
@@ -30,11 +30,12 @@ export default function SyncButton() {
   }
 
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className={compact ? "flex items-center gap-2 text-xs text-muted-foreground" : "flex flex-col gap-1.5"}>
+      {compact && msg && <span className="max-w-[45vw] truncate">{msg}</span>}
       <Button variant="outline" size="sm" onClick={run} disabled={busy} className="w-fit">
         {busy ? "Syncing…" : "↻ Sync now"}
       </Button>
-      {msg && <span>{msg}</span>}
+      {!compact && msg && <span>{msg}</span>}
     </div>
   );
 }

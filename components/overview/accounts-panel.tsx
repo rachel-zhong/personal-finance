@@ -145,7 +145,7 @@ function AccountRow({ a, nested = false }: { a: PanelAccount; nested?: boolean }
   return (
     <div className={cn("flex flex-wrap items-center gap-3", nested ? "py-2" : "border-b border-hairline py-3")}>
       <div className="flex min-w-0 flex-[1_1_220px] flex-col gap-0.5">
-        <Link href={`/accounts/${a.id}`} className={cn("font-medium no-underline hover:underline", nested ? "text-sm" : "text-[15px]",
+        <Link href={`/accounts/${a.id}`} className={cn("tight font-medium no-underline hover:underline", nested ? "text-sm" : "text-[15px]",
           on ? "text-foreground hover:text-foreground" : "text-[#8A8A93] hover:text-[#8A8A93]")}>
           {a.name}
           {a.manual && (

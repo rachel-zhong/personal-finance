@@ -93,7 +93,7 @@ export default async function OverviewPage() {
         <h1 className="text-[32px] font-semibold">Overview</h1>
       </div>
 
-      <section aria-label="Net worth" className="flex flex-wrap items-stretch gap-7 rounded-2xl border border-border bg-card p-7">
+      <section aria-label="Net worth" className="flex flex-wrap items-stretch gap-7 rounded-2xl border border-border bg-card p-5 md:p-7">
         <div className="flex min-w-0 flex-[1_1_260px] flex-col gap-2.5">
           <span className="text-sm font-semibold text-ink-2">Net worth</span>
           <span className="font-heading text-[52px] font-semibold leading-none">{dollars(netWorth)}</span>

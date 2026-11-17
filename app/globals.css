@@ -139,3 +139,17 @@
   a { color: var(--brand); }
   a:hover { color: var(--brand-strong); }
 }
+
+/* Phones: every control is at least 44px tall, Apple's minimum comfortable touch target. */
+@media (max-width: 767px) {
+  button:not(.tight), select, input:not([type="checkbox"]):not([type="radio"]), [role="group"] > a {
+    min-height: 44px;
+  }
+  [role="group"] > a { display: inline-flex; align-items: center; justify-content: center; }
+  button[aria-label^="More options"] { min-width: 44px; }
+  /* Small inline buttons keep their look but get an invisible 44px tap area. */
+  .tight { position: relative; }
+  .tight::after { content: ""; position: absolute; inset: -14px -6px; }
+  /* No zoom-on-focus in iOS Safari: inputs need at least 16px text on phones. */
+  input, select, textarea { font-size: 16px !important; }
+}

@@ -15,7 +15,7 @@ export default function RecentTransactions({ rows, className }: { rows: RecentTx
     <section aria-label="Recent transactions" className={cn("flex min-w-0 flex-col rounded-xl border border-border bg-card px-6 py-5", className)}>
       <div className="flex items-baseline justify-between gap-3">
         <h2 className="text-lg font-semibold">Recent transactions</h2>
-        <Link href="/transactions" className="text-[13px] font-semibold no-underline hover:underline">See all</Link>
+        <Link href="/transactions" className="tight text-[13px] font-semibold no-underline hover:underline">See all</Link>
       </div>
       <div className="flex flex-wrap gap-3 pb-2.5 pt-2 text-xs text-muted-foreground">
         {(["In", "Out", "Transfer"] as const).map((k) => (

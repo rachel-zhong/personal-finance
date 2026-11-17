@@ -38,7 +38,8 @@ export function sortRows(rows: TxnRow[], key: SortKey, dir: 1 | -1, net: boolean
   });
 }
 
-const GRID = "grid grid-cols-[90px_minmax(0,1fr)_150px_200px_150px_32px] gap-3";
+// Phone: merchant + amount on top, date · category below, ⋯ on the right. Wider: the full table.
+const GRID = "grid grid-cols-[minmax(0,1fr)_auto_44px] gap-x-3 gap-y-0.5 md:grid-cols-[90px_minmax(0,1fr)_150px_200px_150px_32px] md:gap-3";
 
 type Tag = { text: string; tone: "returned" | "grey" | "warn" | "open" };
 
@@ -84,8 +85,8 @@ export default function TxnTable({ rows, matches, view, balances = {}, owedAccou
 
   return (
     <section aria-label="Transaction list" className={cn("overflow-x-auto bg-card", bare ? "rounded-b-xl" : "rounded-xl border border-border")}>
-      <div className="min-w-[800px]">
-        <div className={cn(GRID, "border-b border-border px-5 py-3 text-xs font-semibold text-muted-foreground")}>
+      <div className="md:min-w-[800px]">
+        <div className={cn(GRID, "hidden border-b border-border px-5 py-3 text-xs font-semibold text-muted-foreground md:grid")}>
           {header("date", "Date")}{header("merchant", "Merchant")}{header("category", "Category")}
           {header("account", "Account")}{header("amount", "Amount", true)}<span />
         </div>
@@ -125,9 +126,9 @@ export default function TxnTable({ rows, matches, view, balances = {}, owedAccou
 
           return (
             <div key={t.id} className="border-b border-hairline">
-              <div className={cn(GRID, "items-center px-5 py-3.5 text-sm", isOpen ? "bg-field" : "bg-card",
+              <div className={cn(GRID, "items-center px-4 py-3 text-sm md:px-5 md:py-3.5", isOpen ? "bg-field" : "bg-card",
                 net && isRefund && t.applied > 0 && refundLeft <= 0 && "bg-[#FBFBF9] text-[#A1A1AA] [&_span]:!text-[#A1A1AA]")}>
-                <span className="text-muted-foreground">{dayShort(t.date)}</span>
+                <span className="hidden text-muted-foreground md:block">{dayShort(t.date)}</span>
                 <div className="flex min-w-0 flex-wrap items-center gap-2.5">
                   {expandable && (
                     <button type="button" onClick={() => toggle(t.id)} aria-expanded={isOpen} aria-label="Show original transactions"
@@ -147,19 +148,19 @@ export default function TxnTable({ rows, matches, view, balances = {}, owedAccou
                   ))}
                 </div>
                 {t.category === "card_payment" ? (
-                  <span className="truncate px-1.5 py-1 text-ink-2" title="Credit card payments are always transfers between your own accounts">
+                  <span className="hidden truncate px-1.5 py-1 text-ink-2 md:block" title="Credit card payments are always transfers between your own accounts">
                     {categoryLabel(t.category)}
                   </span>
                 ) : (
                 <button type="button" onClick={() => setEditing(editing === t.id ? null : t.id)} aria-expanded={editing === t.id}
                   title="Change category"
-                  className="group/cat flex min-w-0 items-center gap-1 rounded-md px-1.5 py-1 text-left text-ink-2 hover:bg-hairline">
+                  className="group/cat hidden min-w-0 items-center gap-1 rounded-md px-1.5 py-1 text-left text-ink-2 hover:bg-hairline md:flex">
                   <span className="truncate">{categoryLabel(t.category)}</span>
                   {(t.overridden || t.ruled) ? <span className="size-1.5 flex-none rounded-full bg-primary" aria-label="set by you" /> : null}
                   <Pencil className="size-3 flex-none text-muted-foreground/0 group-hover/cat:text-muted-foreground" />
                 </button>
                 )}
-                <span className="truncate text-ink-2">{t.account_name}</span>
+                <span className="hidden truncate text-ink-2 md:block">{t.account_name}</span>
                 <div className="flex flex-col items-end gap-0.5">
                   <span className={cn("font-semibold", amt.tone === "in" ? "text-income-ink" : "text-foreground", t.excluded && "text-muted-foreground line-through")}>{amt.text}</span>
                   {returned && <span className="text-xs text-muted-foreground line-through">{money(-t.amount)}</span>}
@@ -174,7 +175,24 @@ export default function TxnTable({ rows, matches, view, balances = {}, owedAccou
                     </span>
                   )}
                 </div>
-                <TxnRowMenu t={t} label={t.merchant || t.description || "transaction"} />
+                <div className="row-span-2 self-center md:row-span-1">
+                  <TxnRowMenu t={t} label={t.merchant || t.description || "transaction"} />
+                </div>
+                {/* Phone only: date · category (tap to change) under the merchant */}
+                <div className="col-span-2 flex min-w-0 flex-wrap items-center gap-x-1.5 text-xs text-muted-foreground md:hidden">
+                  <span>{dayShort(t.date)}</span>
+                  <span aria-hidden="true">·</span>
+                  {t.category === "card_payment"
+                    ? <span>{categoryLabel(t.category)}</span>
+                    : (
+                      <button type="button" onClick={() => setEditing(editing === t.id ? null : t.id)} aria-expanded={editing === t.id}
+                        className="tight -my-1 rounded px-1 py-1 text-left text-xs text-ink-2 underline decoration-dotted underline-offset-2">
+                        {categoryLabel(t.category)}
+                      </button>
+                    )}
+                  <span aria-hidden="true">·</span>
+                  <span className="truncate">{t.account_name}</span>
+                </div>
               </div>
               {editing === t.id && <CategoryEditor t={t} onDone={() => setEditing(null)} />}
               {isOpen && <Originals t={t} links={matches[t.id] ?? []} refundLeft={refundLeft} />}

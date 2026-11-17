@@ -60,7 +60,7 @@ export default async function AccountPage({ params, searchParams }: {
 
   return (
     <>
-      <Link href="/" className="text-sm font-medium no-underline">← Back to overview</Link>
+      <Link href="/" className="tight w-fit text-sm font-medium no-underline">← Back to overview</Link>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-1.5">
           <h1 className="text-[32px] font-semibold">{accountLabel(a)}</h1>
@@ -109,13 +109,13 @@ export default async function AccountPage({ params, searchParams }: {
             </div>
           </div>
           <div className="overflow-x-auto">
-            <div className="min-w-[680px]">
+            <div className="md:min-w-[680px]">
               {rows.map((r) => {
                 const isIn = r.amount > 0;
                 const cat = categoryLabel(r.category) + (r.flow === "transfer" && !r.excluded ? (isIn ? " · not income" : " · not spending") : "");
                 return (
-                  <div key={r.id} className="grid grid-cols-[80px_minmax(0,1fr)_170px_140px_32px] items-center gap-3 border-b border-hairline px-5 py-3.5 text-sm">
-                    <span className="text-muted-foreground">{dayShort(r.date)}</span>
+                  <div key={r.id} className="grid grid-cols-[minmax(0,1fr)_auto_44px] items-center gap-x-3 gap-y-0.5 border-b border-hairline px-4 py-3 text-sm md:grid-cols-[80px_minmax(0,1fr)_170px_140px_32px] md:gap-3 md:px-5 md:py-3.5">
+                    <span className="hidden text-muted-foreground md:block">{dayShort(r.date)}</span>
                     <div className="flex min-w-0 items-center gap-2.5">
                       <span aria-hidden="true" className={cn("flex size-7 flex-none items-center justify-center rounded-full text-[15px] font-bold",
                         isIn ? "bg-accent text-accent-foreground" : "bg-hairline text-ink-2")}>{isIn ? "↓" : "↑"}</span>
@@ -127,7 +127,7 @@ export default async function AccountPage({ params, searchParams }: {
                         </span>
                       ) : null}
                     </div>
-                    <span className="truncate text-muted-foreground">{cat}</span>
+                    <span className="hidden truncate text-muted-foreground md:block">{cat}</span>
                     <span className="flex flex-col items-end">
                       <span className={cn("font-semibold", isIn && "text-income-ink", r.excluded && "text-muted-foreground line-through")}>
                         {isIn ? `+${money(r.amount)}` : money(r.amount)}
@@ -140,7 +140,10 @@ export default async function AccountPage({ params, searchParams }: {
                         </span>
                       )}
                     </span>
-                    <TxnRowMenu t={r} label={r.merchant || r.description || "transaction"} />
+                    <div className="row-span-2 self-center md:row-span-1">
+                      <TxnRowMenu t={r} label={r.merchant || r.description || "transaction"} />
+                    </div>
+                    <span className="col-span-2 truncate pl-[38px] text-xs text-muted-foreground md:hidden">{dayShort(r.date)} · {cat}</span>
                   </div>
                 );
               })}

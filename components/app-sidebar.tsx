@@ -10,7 +10,7 @@ export default async function AppSidebar() {
   );
   return (
     <nav aria-label="Main"
-      className="box-border flex max-w-full flex-[1_1_200px] flex-col gap-7 border-r border-border bg-sidebar px-5 py-7 sm:sticky sm:top-0 sm:h-screen sm:max-w-[240px]">
+      className="box-border hidden w-[240px] flex-none flex-col gap-7 border-r border-border bg-sidebar px-5 py-7 md:sticky md:top-0 md:flex md:h-screen">
       <div className="flex items-center gap-2.5">
         <div className="flex size-8 items-center justify-center rounded-lg bg-primary">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8" /><path d="M14 7h7v7" /></svg>

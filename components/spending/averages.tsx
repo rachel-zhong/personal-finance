@@ -36,9 +36,9 @@ export function Summary({ monthLabel, month, average, averageLabel, avgMonths, h
         {month.map((s) => (
           <div key={s.label} className="flex min-w-0 flex-col gap-1 px-5 pb-4 pt-2">
             <span className="text-[13px] text-muted-foreground">{s.label}</span>
-            <span className={cn("font-heading text-[28px] font-semibold leading-tight",
+            <span className={cn("flex flex-wrap items-baseline gap-x-1.5 font-heading text-[28px] font-semibold leading-tight",
               s.tone === "spend" && "text-[#B45309]", s.tone === "income" && "text-income-ink")}>
-              {s.value}{s.unit && <span className="ml-1.5 font-sans text-sm font-medium text-muted-foreground">{s.unit}</span>}
+              {s.value}{s.unit && <span className="font-sans text-sm font-medium text-muted-foreground">{s.unit}</span>}
             </span>
             <span className="text-xs text-muted-foreground">{s.sub}</span>
           </div>
@@ -47,8 +47,8 @@ export function Summary({ monthLabel, month, average, averageLabel, avgMonths, h
 
       <div className="mx-5 border-t border-hairline" />
       {/* The 6 / 12 month switch sits on the average row, because that's the only row it changes */}
-      <div className="flex flex-wrap items-center justify-between gap-2 pr-5 pt-3">
-        <p className={rowLabel}>{averageLabel}</p>
+      <div className="flex flex-wrap items-center justify-between gap-2 px-5 pt-3">
+        <p className={cn(rowLabel, "px-0")}>{averageLabel}</p>
         <div role="group" aria-label="Average over" className="flex overflow-hidden rounded-md border border-input text-xs font-semibold">
           {[6, 12].map((n, i) => (
             <Link key={n} scroll={false} aria-pressed={avgMonths === n} href={href(n)}
