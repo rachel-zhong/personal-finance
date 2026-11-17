@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Overview</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F6F6F3}
+a{color:#0F6B5C}a:hover{color:#0B5246}
+</style>
+</helmet>
+<div style="min-height: 100vh; display: flex; flex-wrap: wrap; font-family: Inter, system-ui, sans-serif; color: #18181B; background: #F6F6F3">
+
+  <nav aria-label="Main" style="flex: 1 1 200px; max-width: 100%; box-sizing: border-box; padding: 24px 16px; display: flex; flex-direction: column; gap: 24px; background: #FFFFFF; border-right: 1px solid #E4E4DF">
+    <div style="display: flex; align-items: center; gap: 10px; padding: 0 4px">
+      <div style="width: 32px; height: 32px; border-radius: 8px; background: #0F6B5C; display: flex; align-items: center; justify-content: center">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"></path><path d="M14 7h7v7"></path></svg>
+      </div>
+      <span style="font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 18px">My Money</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <a href="Main.dc.html" aria-current="page" style="text-decoration: none; padding: 10px 12px; border-radius: 8px; background: #E3F1EE; color: #0B5246; font-weight: 600; font-size: 14px">Overview</a>
+      <a href="Spending.dc.html" style="text-decoration: none; padding: 10px 12px; border-radius: 8px; color: #3F3F46; font-weight: 500; font-size: 14px">Spending</a>
+      <a href="Transactions.dc.html" style="text-decoration: none; padding: 10px 12px; border-radius: 8px; color: #3F3F46; font-weight: 500; font-size: 14px">Transactions</a>
+      <span style="padding: 18px 12px 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; color: #5B5B63">DATA</span>
+      <a href="#connections" style="text-decoration: none; padding: 10px 12px; border-radius: 8px; color: #3F3F46; font-weight: 500; font-size: 14px">Connections</a>
+    </div>
+    <div style="margin-top: auto; display: flex; flex-direction: column; gap: 8px; padding: 0 4px">
+      <span style="font-size: 12px; color: #5B5B63; line-height: 1.5">Last synced today, 7:57 PM<br>7 connections</span>
+      <button type="button" style="align-self: flex-start; min-height: 32px; padding: 0 12px; border: 1px solid #CFCFC8; border-radius: 8px; background: #FFFFFF; font-family: inherit; font-size: 13px; font-weight: 600; color: #3F3F46; cursor: pointer">Sync now</button>
+    </div>
+  </nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 32px 40px 48px; display: flex; flex-direction: column; gap: 20px; max-width: 1280px">
+
+    <div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px">
+      <h1 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 32px; font-weight: 600">Overview</h1>
+      <span style="font-size: 12px; font-weight: 600; color: #9A3412; background: #FFEDD5; padding: 4px 10px; border-radius: 999px">Sample data</span>
+    </div>
+
+    <section aria-label="Net worth" style="background: #FFFFFF; border: 1px solid #E4E4DF; border-radius: 16px; padding: 28px; display: flex; flex-wrap: wrap; gap: 28px; align-items: stretch">
+      <div style="flex: 1 1 280px; min-width: 0; display: flex; flex-direction: column; gap: 10px">
+        <span style="font-size: 14px; font-weight: 600; color: #3F3F46">Net worth</span>
+        <span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 52px; font-weight: 600; line-height: 1">$424,905</span>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
+          <span style="font-size: 13px; font-weight: 600; color: #15803D; background: #DCFCE7; padding: 4px 10px; border-radius: 999px">+$3,505 (+0.8%)</span>
+          <span style="font-size: 13px; color: #5B5B63">vs. Oct 31 snapshot</span>
+        </div>
+        <p style="margin: 4px 0 0; font-size: 13px; color: #3F3F46">$154,990 cash + $143,500 investments + $131,350 retirement − $4,935 card balances</p>
+        <p style="margin: 0; font-size: 13px; color: #5B5B63">Cash, investments and retirement minus card balances. Excludes money held for others.</p>
+      </div>
+      <div style="flex: 2 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 8px">
+        <span style="font-size: 12px; font-weight: 600; color: #5B5B63">Quarter-end net worth</span>
+        <div style="position: relative; height: 170px">
+          <svg viewBox="0 0 640 170" preserveAspectRatio="none" aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 170px; display: block">
+            <line x1="0" y1="150" x2="640" y2="150" stroke="#E4E4DF" stroke-width="1"></line>
+            <path d="{{areaPath}}" fill="#E3F1EE"></path>
+            <polyline points="{{linePoints}}" fill="none" stroke="#0F6B5C" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"></polyline>
+          </svg>
+          <sc-for list="{{quarters}}" as="q" hint-placeholder-count="4">
+            <div style="position: absolute; left: {{q.left}}; top: {{q.top}}; transform: translate(-50%, -50%); width: 12px; height: 12px; box-sizing: border-box; border-radius: 999px; background: #FFFFFF; border: 2.5px solid #0F6B5C"></div>
+            <span style="position: absolute; left: {{q.left}}; top: {{q.top}}; transform: translate(-50%, -30px); font-size: 12px; font-weight: 600; white-space: nowrap">{{q.value}}</span>
+          </sc-for>
+        </div>
+        <div style="position: relative; height: 16px">
+          <sc-for list="{{quarters}}" as="q" hint-placeholder-count="4">
+            <span style="position: absolute; left: {{q.left}}; transform: translateX(-50%); font-size: 11px; color: #5B5B63; white-space: nowrap">{{q.label}}</span>
+          </sc-for>
+        </div>
+        <p style="margin: 4px 0 0; font-size: 12px; color: #5B5B63">Real balances saved on the last day of each month, shown at quarter end. No estimates. The chart appears once there are more than 2 quarters of snapshots.</p>
+      </div>
+    </section>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px">
+      <div style="background: #FFFFFF; border: 1px solid #E4E4DF; border-radius: 12px; padding: 18px; display: flex; gap: 14px; align-items: flex-start">
+        <span style="width: 40px; height: 40px; flex: 0 0 40px; border-radius: 10px; background: #E3F1EE; display: flex; align-items: center; justify-content: center">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0B5246" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10l9-6 9 6"></path><path d="M5 10v8"></path><path d="M9.5 10v8"></path><path d="M14.5 10v8"></path><path d="M19 10v8"></path><path d="M3 20h18"></path></svg>
+        </span>
+        <div style="display: flex; flex-direction: column; gap: 4px; min-width: 0">
+          <span style="font-size: 13px; color: #5B5B63">Cash and savings</span>
+          <span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 26px; font-weight: 600">$154,990</span>
+          <span style="font-size: 12px; color: #5B5B63">After $120,000 held for others</span>
+        </div>
+      </div>
+      <div style="background: #FFFFFF; border: 1px solid #E4E4DF; border-radius: 12px; padding: 18px; display: flex; gap: 14px; align-items: flex-start">
+        <span style="width: 40px; height: 40px; flex: 0 0 40px; border-radius: 10px; background: #DBEAFE; display: flex; align-items: center; justify-content: center">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1D4ED8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"></path><path d="M14 7h7v7"></path></svg>
+        </span>
+        <div style="display: flex; flex-direction: column; gap: 4px; min-width: 0">
+          <span style="font-size: 13px; color: #5B5B63">Investments</span>
+          <span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 26px; font-weight: 600">$143,500</span>
+          <span style="font-size: 12px; color: #5B5B63">Schwab, manual</span>
+        </div>
+      </div>
+      <div style="background: #FFFFFF; border: 1px solid #E4E4DF; border-radius: 12px; padding: 18px; display: flex; gap: 14px; align-items: flex-start">
+        <span style="width: 40px; height: 40px; flex: 0 0 40px; border-radius: 10px; background: #FEF3C7; display: flex; align-items: center; justify-content: center">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#92400E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v3"></path><path d="M12 18v3"></path><circle cx="12" cy="12" r="6"></circle><path d="M12 9v3l2 1.5"></path></svg>
+        </span>
+        <div style="display: flex; flex-direction: column; gap: 4px; min-width: 0">
+          <span style="font-size: 13px; color: #5B5B63">Retirement</span>
+          <span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 26px; font-weight: 600">$131,350</span>
+          <span style="font-size: 12px; color: #5B5B63">Vanguard, manual</span>
+        </div>
+      </div>
+      <div style="background: #FFFFFF; border: 1px dashed #CFCFC8; border-radius: 12px; padding: 18px; display: flex; gap: 14px; align-items: flex-start">
+        <span style="width: 40px; height: 40px; flex: 0 0 40px; border-radius: 10px; background: #EDE9FE; display: flex; align-items: center; justify-content: center">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5B21B6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.6-7 10-7 10z"></path></svg>
+        </span>
+        <div style="display: flex; flex-direction: column; gap: 4px; min-width: 0">
+          <span style="font-size: 13px; color: #5B5B63">Held for others</span>
+          <span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 26px; font-weight: 600">$120,000</span>
+          <span style="font-size: 12px; color: #5B5B63">In 2 accounts. Not in net worth.</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: stretch">
+
+      <section aria-label="Accounts" style="flex: 3 1 500px; min-width: 0; background: #FFFFFF; border: 1px solid #E4E4DF; border-radius: 12px; padding: 20px 24px; display: flex; flex-direction: column">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px">
+          <h2 style="margin: 0; font-size: 18px; font-weight: 600">Accounts</h2>
+          <button type="button" style="min-height: 40px; padding: 0 14px; border: 1px solid #0F6B5C; border-radius: 8px; background: #FFFFFF; color: #0F6B5C; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer">+ Add account manually</button>
+        </div>
+
+        <sc-for list="{{groups}}" as="g" hint-placeholder-count="4">
+          <div style="display: flex; flex-direction: column; padding-top: 16px">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; padding: 6px 0; border-bottom: 1px solid #E4E4DF">
+              <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #5B5B63">{{g.label}}</span>
+              <span style="font-size: 12px; font-weight: 600; color: #5B5B63">{{g.total}}</span>
+            </div>
+            <sc-for list="{{g.banks}}" as="b" hint-placeholder-count="2">
+              <div style="border-bottom: 1px solid #EFEFEA">
+                <sc-if value="{{b.multi}}" hint-placeholder-val="{{ true }}">
+                  <button type="button" onClick="{{b.toggle}}" aria-expanded="{{b.open}}" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 12px 0; border: none; background: transparent; cursor: pointer; font-family: inherit; text-align: left; color: #18181B">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3F3F46" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transform: {{b.chevron}}; flex: 0 0 14px"><path d="M9 6l6 6-6 6"></path></svg>
+                    <span style="flex: 1 1 auto; display: flex; flex-direction: column; gap: 2px; min-width: 0">
+                      <span style="font-size: 15px; font-weight: 600">{{b.name}}</span>
+                      <span style="font-size: 12px; color: #5B5B63">{{b.sub}}</span>
+                    </span>
+                    <span style="font-size: 15px; font-weight: 600; margin-right: 34px">{{b.total}}</span>
+                  </button>
+                  <sc-if value="{{b.open}}" hint-placeholder-val="{{ false }}">
+                    <div style="margin: 0 0 10px 6px; border-left: 2px solid #EFEFEA; padding-left: 18px">
+                      <sc-for list="{{b.accounts}}" as="a" hint-placeholder-count="2">
+                        <div style="display: flex; align-items: center; gap: 10px; padding: 8px 0">
+                          <div style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 1px">
+                            <a href="Account.dc.html" style="text-decoration: none; font-size: 14px; font-weight: 500; color: #18181B">{{a.name}}</a>
+                            <sc-if value="{{a.hasNote}}" hint-placeholder-val="{{ false }}"><span style="font-size: 12px; color: #5B21B6">{{a.note}}</span></sc-if>
+                          </div>
+                          <span style="text-align: right; font-size: 14px; font-weight: 600">{{a.balance}}</span>
+                          <button type="button" aria-label="Edit {{a.name}}" style="width: 24px; height: 24px; border: none; background: transparent; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center; visibility: {{a.pencil}}">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A8A93" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16.5 3.5l4 4L8 20H4v-4z"></path></svg>
+                          </button>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                </sc-if>
+                <sc-if value="{{b.single}}" hint-placeholder-val="{{ false }}">
+                  <div style="display: flex; align-items: center; gap: 10px; padding: 12px 0 12px 24px">
+                    <div style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+                      <span style="display: flex; align-items: center; gap: 8px">
+                        <a href="Account.dc.html" style="text-decoration: none; font-size: 15px; font-weight: 600; color: #18181B">{{b.one.name}}</a>
+                        <sc-if value="{{b.one.manual}}" hint-placeholder-val="{{ false }}"><span style="font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 4px; background: #EFEFEA; color: #3F3F46">Manual</span></sc-if>
+                      </span>
+                      <span style="font-size: 12px; color: #5B5B63">{{b.one.meta}}</span>
+                    </div>
+                    <span style="text-align: right; font-size: 15px; font-weight: 600">{{b.one.balance}}</span>
+                    <button type="button" aria-label="Edit {{b.one.name}}" style="width: 24px; height: 24px; border: none; background: transparent; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center; visibility: {{b.one.pencil}}">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A8A93" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16.5 3.5l4 4L8 20H4v-4z"></path></svg>
+                    </button>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+        <p style="margin: 14px 0 0; font-size: 12px; color: #5B5B63">Click a bank to expand it, or an account to see every transaction in and out. Use the pencil to mark money held for others or update a manual balance.</p>
+      </section>
+
+      <section aria-label="Recent transactions" style="flex: 2 1 340px; min-width: 0; background: #FFFFFF; border: 1px solid #E4E4DF; border-radius: 12px; padding: 20px 24px; display: flex; flex-direction: column">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px">
+          <h2 style="margin: 0; font-size: 18px; font-weight: 600">Recent transactions</h2>
+          <a href="Transactions.dc.html" style="font-size: 13px; font-weight: 600; text-decoration: none">See all</a>
+        </div>
+        <div style="display: flex; gap: 12px; padding: 8px 0 10px; font-size: 12px; color: #5B5B63; flex-wrap: wrap">
+          <span style="display: flex; align-items: center; gap: 5px"><span style="width: 8px; height: 8px; border-radius: 999px; background: #22A05A"></span>In</span>
+          <span style="display: flex; align-items: center; gap: 5px"><span style="width: 8px; height: 8px; border-radius: 999px; background: #F08A3C"></span>Out</span>
+          <span style="display: flex; align-items: center; gap: 5px"><span style="width: 8px; height: 8px; border-radius: 999px; background: #A1A1AA"></span>Transfer between my accounts</span>
+        </div>
+        <div style="flex: 1 1 0; min-height: 420px; position: relative">
+          <div style="position: absolute; inset: 0; overflow-y: auto">
+            <sc-for list="{{recent}}" as="r" hint-placeholder-count="12">
+              <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid #EFEFEA">
+                <span style="flex: 0 0 72px; font-size: 11px; font-weight: 700; text-align: center; padding: 3px 0; border-radius: 999px; background: {{r.chipBg}}; color: {{r.chipFg}}">{{r.kind}}</span>
+                <div style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 1px">
+                  <span style="font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.desc}}</span>
+                  <span style="font-size: 12px; color: #5B5B63">{{r.date}} · {{r.account}}</span>
+                </div>
+                <span style="font-size: 14px; font-weight: 600; white-space: nowrap; color: {{r.color}}">{{r.amount}}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { open: { ally: true } };
+  }
+  renderVals() {
+    const self = this;
+    const fmt = function (n) { return (n < 0 ? '−' : '') + '$' + Math.abs(Math.round(n)).toLocaleString('en-US'); };
+    const synced = 'synced today, 7:57 PM';
+    const accts = [
+      { group: 'cash', bank: 'boa', bankName: 'Wells Fargo', name: 'Adv Plus Banking ••1182', bal: 6240, edit: true },
+      { group: 'cash', bank: 'boa', bankName: 'Wells Fargo', name: 'Advantage Savings ••7731', bal: 1850, edit: true },
+      { group: 'cash', bank: 'cap1', bankName: 'Discover', name: '360 Performance Savings ••5520', bal: 28400, edit: true },
+      { group: 'cash', bank: 'cap1', bankName: 'Discover', name: 'CD ••3317', bal: 15000, edit: true },
+      { group: 'cash', bank: 'ally', bankName: 'Ally Bank', name: 'Online Savings ••9046', bal: 98500, edit: true, held: 40000, note: '$40,000 held for others · $58,500 yours' },
+      { group: 'cash', bank: 'ally', bankName: 'Ally Bank', name: 'CD - Family ••2268', bal: 80000, edit: true, held: 80000, note: 'All held for others' },
+      { group: 'cash', bank: 'ally', bankName: 'Ally Bank', name: 'Certificate of Deposit ••4410', bal: 20000, edit: true },
+      { group: 'cash', bank: 'ally', bankName: 'Ally Bank', name: 'Certificate of Deposit ••6623', bal: 25000, edit: true },
+      { group: 'invest', bank: 'rh', bankName: 'Schwab', name: 'Schwab individual ••8812', bal: 92300 },
+      { group: 'invest', bank: 'rh', bankName: 'Schwab', name: 'Crypto ••4471', bal: 1200 },
+      { group: 'invest', bank: 'rsu', bankName: 'Manual', name: 'Company RSU', bal: 40000, manual: true, meta: 'Updated Nov 15, 2026' },
+      { group: 'invest', bank: 'tsy', bankName: 'Manual', name: 'I Bonds', bal: 10000, manual: true, meta: 'Updated Nov 14, 2026' },
+      { group: 'retire', bank: 'fid', bankName: 'Vanguard', name: '401(k) Plan ••5098', bal: 22400 },
+      { group: 'retire', bank: 'fid', bankName: 'Vanguard', name: 'Roth IRA ••3364', bal: 12900 },
+      { group: 'retire', bank: 'fid', bankName: 'Vanguard', name: 'Traditional IRA ••7720', bal: 50 },
+      { group: 'retire', bank: 'old401k', bankName: 'Manual', name: 'Previous employer 401k', bal: 96000, manual: true, meta: 'Updated Nov 13, 2026' },
+      { group: 'cards', bank: 'amex', bankName: 'American Express', name: 'Gold Card ••2255', bal: -480 },
+      { group: 'cards', bank: 'boac', bankName: 'Wells Fargo', name: 'Unlimited Cash Rewards ••6610', bal: -35 },
+      { group: 'cards', bank: 'cap1c', bankName: 'Discover', name: 'Double Cash ••4120', bal: -3900 },
+      { group: 'cards', bank: 'chase', bankName: 'US Bank', name: 'Credit Card ••7781', bal: -520 }
+    ];
+    const open = this.state.open;
+    const sum = function (l) { return l.reduce(function (s, a) { return s + a.bal; }, 0); };
+    const held = function (l) { return l.reduce(function (s, a) { return s + (a.held || 0); }, 0); };
+    const flip = function (id) { return function () { const n = Object.assign({}, self.state.open); n[id] = !n[id]; self.setState({ open: n }); }; };
+    const labels = { cash: 'Cash and savings', invest: 'Investments', retire: 'Retirement', cards: 'Credit cards' };
+    const groups = ['cash', 'invest', 'retire', 'cards'].map(function (g) {
+      const inG = accts.filter(function (a) { return a.group === g; });
+      const ids = [];
+      inG.forEach(function (a) { if (ids.indexOf(a.bank) < 0) { ids.push(a.bank); } });
+      const banks = ids.map(function (bid) {
+        const list = inG.filter(function (a) { return a.bank === bid; });
+        const h = held(list);
+        const isOpen = !!open[bid];
+        const first = list[0];
+        return {
+          name: first.bankName,
+          sub: list.length + ' accounts' + (h ? ' · ' + fmt(h) + ' held for others' : ''),
+          total: fmt(sum(list)),
+          multi: list.length > 1, single: list.length === 1,
+          open: isOpen, chevron: isOpen ? 'rotate(90deg)' : 'none', toggle: flip(bid),
+          one: { name: first.manual ? first.name : first.bankName + ' · ' + first.name, manual: !!first.manual, meta: first.meta || first.bankName + ' · ' + synced, balance: fmt(first.bal), pencil: (first.manual || first.edit) ? 'visible' : 'hidden' },
+          accounts: list.map(function (a) { return { name: a.name, balance: fmt(a.bal), hasNote: !!a.note, note: a.note || '', pencil: (a.edit || a.manual) ? 'visible' : 'hidden' }; })
+        };
+      });
+      const gh = held(inG);
+      return { label: labels[g], total: fmt(sum(inG) - gh), banks: banks };
+    });
+
+    const snaps = [
+      { label: 'Dec 31, 2025', v: 371200 }, { label: 'Mar 31, 2026', v: 389600 },
+      { label: 'Jun 30, 2026', v: 402300 }, { label: 'Sep 30, 2026', v: 418900 }
+    ];
+    const lo = 360000, hi = 430000;
+    const pos = snaps.map(function (s, i) { return { x: 48 + i / (snaps.length - 1) * 544, y: 140 - (s.v - lo) / (hi - lo) * 100 }; });
+    const pts = pos.map(function (p) { return Math.round(p.x) + ',' + Math.round(p.y); });
+    const quarters = snaps.map(function (s, i) { return { label: s.label, value: '$' + (s.v / 1000).toFixed(1) + 'k', left: (pos[i].x / 640 * 100).toFixed(2) + '%', top: (pos[i].y / 170 * 100).toFixed(2) + '%' }; });
+
+    const kinds = {
+      In: { bg: '#DCFCE7', fg: '#15803D', color: '#15803D' },
+      Out: { bg: '#FFEDD5', fg: '#9A3412', color: '#18181B' },
+      Transfer: { bg: '#EFEFEA', fg: '#3F3F46', color: '#5B5B63' }
+    };
+    const rec = [
+      ['Nov 16', "Whole Foods", 'Amex Platinum', '−$64.20', 'Out'],
+      ['Nov 15', 'Amazon refund', 'Citi', '+$45.00', 'In'],
+      ['Nov 14', 'Paycheck', 'Wells Fargo', '+$3,850.00', 'In'],
+      ['Nov 14', 'To Schwab', 'Wells Fargo', '−$1,500.00', 'Transfer'],
+      ['Nov 14', 'To I Bonds', 'Discover', '−$10,000.00', 'Transfer'],
+      ['Nov 13', 'Equinox', 'Double Cash', '−$215.00', 'Out'],
+      ['Nov 12', 'Whole Foods', 'Double Cash', '−$86.40', 'Out'],
+      ['Nov 11', 'Interest', 'Ally', '+$312.40', 'In'],
+      ['Nov 10', 'Double Cash payment', 'Wells Fargo', '−$2,100.00', 'Transfer'],
+      ['Nov 8', 'Amazon', 'Citi', '−$129.99', 'Out'],
+      ['Nov 6', 'City Power & Light', 'Wells Fargo', '−$72.10', 'Out'],
+      ['Nov 5', 'Nordstrom refund', 'Double Cash', '+$67.00', 'In'],
+      ['Nov 3', 'Rent', 'Wells Fargo', '−$2,400.00', 'Out'],
+      ['Nov 1', 'Paycheck', 'Wells Fargo', '+$3,850.00', 'In'],
+      ['Oct 31', 'Savings transfer', 'Discover', '+$1,000.00', 'Transfer'],
+      ['Oct 30', 'Sweetgreen', 'Amex Platinum', '−$18.50', 'Out']
+    ];
+    const recent = rec.map(function (r) { const k = kinds[r[4]]; return { date: r[0], desc: r[1], account: r[2], amount: r[3], kind: r[4], chipBg: k.bg, chipFg: k.fg, color: k.color }; });
+
+    return {
+      groups: groups,
+      quarters: quarters,
+      linePoints: pts.join(' '),
+      areaPath: 'M' + Math.round(pos[0].x) + ',150 L' + pts.join(' L') + ' L' + Math.round(pos[pos.length - 1].x) + ',150 Z',
+      recent: recent
+    };
+  }
+}
+</script>
+</body>
+</html>

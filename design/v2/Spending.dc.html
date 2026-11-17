@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Spending</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F6F6F3}
+a{color:#0F6B5C}a:hover{color:#0B5246}
+</style>
+</helmet>
+<div style="min-height: 100vh; display: flex; flex-wrap: wrap; font-family: Inter, system-ui, sans-serif; color: #18181B; background: #F6F6F3">
+
+  <nav aria-label="Main" style="flex: 1 1 200px; max-width: 100%; box-sizing: border-box; padding: 24px 16px; display: flex; flex-direction: column; gap: 24px; background: #FFFFFF; border-right: 1px solid #E4E4DF">
+    <div style="display: flex; align-items: center; gap: 10px; padding: 0 4px">
+      <div style="width: 32px; height: 32px; border-radius: 8px; background: #0F6B5C; display: flex; align-items: center; justify-content: center">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"></path><path d="M14 7h7v7"></path></svg>
+      </div>
+      <span style="font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 18px">My Money</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <a href="Main.dc.html" style="text-decoration: none; padding: 10px 12px; border-radius: 8px; color: #3F3F46; font-weight: 500; font-size: 14px">Overview</a>
+      <a href="Spending.dc.html" aria-current="page" style="text-decoration: none; padding: 10px 12px; border-radius: 8px; background: #E3F1EE; color: #0B5246; font-weight: 600; font-size: 14px">Spending</a>
+      <a href="Transactions.dc.html" style="text-decoration: none; padding: 10px 12px; border-radius: 8px; color: #3F3F46; font-weight: 500; font-size: 14px">Transactions</a>
+      <span style="padding: 18px 12px 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; color: #5B5B63">DATA</span>
+      <a href="#connections" style="text-decoration: none; padding: 10px 12px; border-radius: 8px; color: #3F3F46; font-weight: 500; font-size: 14px">Connections</a>
+    </div>
+    <div style="margin-top: auto; display: flex; flex-direction: column; gap: 8px; padding: 0 4px">
+      <span style="font-size: 12px; color: #5B5B63; line-height: 1.5">Last synced today, 7:57 PM<br>7 connections</span>
+      <button type="button" style="align-self: flex-start; min-height: 32px; padding: 0 12px; border: 1px solid #CFCFC8; border-radius: 8px; background: #FFFFFF; font-family: inherit; font-size: 13px; font-weight: 600; color: #3F3F46; cursor: pointer">Sync now</button>
+    </div>
+  </nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 32px 40px 48px; display: flex; flex-direction: column; gap: 20px; max-width: 1280px">
+
+    <div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px">
+      <h1 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 32px; font-weight: 600">Spending</h1>
+      <span style="font-size: 12px; font-weight: 600; color: #9A3412; background: #FFEDD5; padding: 4px 10px; border-radius: 999px">Sample data</span>
+    </div>
+
+    <section aria-label="Income and spending by month" style="background: #FFFFFF; border: 1px solid #E4E4DF; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 14px">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; align-items: center">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 600">Income and spending</h2>
+        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap">
+          <div style="display: flex; gap: 14px; font-size: 12px; color: #3F3F46">
+            <span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #22A05A"></span>Income</span>
+            <span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #F08A3C"></span>Spent (net)</span>
+            <span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #B8B8B0"></span>Returned</span>
+          </div>
+          <div role="group" aria-label="Months shown" style="display: flex; border: 1px solid #CFCFC8; border-radius: 8px; overflow: hidden">
+            <sc-for list="{{ranges}}" as="r" hint-placeholder-count="3">
+              <button type="button" onClick="{{r.pick}}" aria-pressed="{{r.pressed}}" style="min-height: 32px; padding: 0 12px; border: none; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; background: {{r.bg}}; color: {{r.fg}}">{{r.label}}</button>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      <div style="display: flex; align-items: flex-end; gap: 6px; height: 220px; border-bottom: 1px solid #E4E4DF">
+        <sc-for list="{{months}}" as="m" hint-placeholder-count="6">
+          <button type="button" onClick="{{m.pick}}" aria-pressed="{{m.sel}}" title="{{m.tip}}" style="flex: 1 1 0; min-width: 0; height: 100%; display: flex; align-items: flex-end; justify-content: center; gap: 4px; padding: 8px 2px 0; border: none; border-radius: 6px 6px 0 0; cursor: pointer; background: {{m.bg}}; opacity: {{m.op}}">
+            <span style="flex: 1 1 0; max-width: 24px; height: {{m.incH}}; background: #22A05A; border-radius: 3px 3px 0 0"></span>
+            <span style="flex: 1 1 0; max-width: 24px; display: flex; flex-direction: column; gap: 2px">
+              <span style="height: {{m.retH}}; background: #B8B8B0; border-radius: 3px 3px 0 0"></span>
+              <span style="height: {{m.spH}}; background: #F08A3C"></span>
+            </span>
+          </button>
+        </sc-for>
+      </div>
+      <div style="display: flex; gap: 6px">
+        <sc-for list="{{months}}" as="m" hint-placeholder-count="6">
+          <span style="flex: 1 1 0; min-width: 0; text-align: center; font-size: 12px; color: {{m.labelColor}}; font-weight: {{m.labelWeight}}">{{m.label}}</span>
+        </sc-for>
+      </div>
+      <p style="margin: 0; font-size: 12px; color: #5B5B63">Click a month to see it below. Returns count in the month of the original purchase. Moving money between your own accounts isn't income.</p>
+    </section>
+
+    <h2 style="margin: 8px 0 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 22px; font-weight: 600">{{monthTitle}}</h2>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px">
+      <div style="background: #FFFFFF; border: 1px solid #E4E4DF; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 13px; color: #5B5B63">Net spending</span>
+        <span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 28px; font-weight: 600; color: #B45309">{{cur.sp}}</span>
+        <span style="font-size: 12px; color: #5B5B63">{{cur.spNote}}</span>
+      </div>
+      <div style="background: #FFFFFF; border: 1px solid #E4E4DF; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 13px; color: #5B5B63">Income</span>
+        <span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 28px; font-weight: 600; color: #15803D">{{cur.inc}}</span>
+        <span style="font-size: 12px; color: #5B5B63">Paychecks, interest, dividends</span>
+      </div>
+      <div style="background: #FFFFFF; border: 1px solid #E4E4DF; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 13px; color: #5B5B63">Saved</span>
+        <span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 28px; font-weight: 600">{{cur.saved}}</span>
+        <span style="font-size: 12px; color: #5B5B63">{{cur.rate}}</span>
+      </div>
+      <div style="background: #E3F1EE; border: 1px solid #B9DCD4; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 13px; color: #0B5246">Cash savings</span>
+        <span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 28px; font-weight: 600">{{cur.cash}}</span>
+        <span style="font-size: 12px; color: #0B5246">{{cur.cashNote}}</span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: stretch">
+      <section aria-label="Monthly averages" style="flex: 2 1 340px; min-width: 0; background: #FFFFFF; border: 1px solid #E4E4DF; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 14px">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px">
+          <div>
+            <h3 style="margin: 0; font-size: 16px; font-weight: 600">Monthly averages</h3>
+            <p style="margin: 4px 0 0; font-size: 12px; color: #5B5B63">The {{avgN}} months ending {{monthName}}</p>
+          </div>
+          <div role="group" aria-label="Average over" style="display: flex; border: 1px solid #CFCFC8; border-radius: 8px; overflow: hidden">
+            <button type="button" onClick="{{avg6}}" aria-pressed="{{a6p}}" style="min-height: 32px; padding: 0 12px; border: none; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; background: {{a6bg}}; color: {{a6fg}}">6 mo</button>
+            <button type="button" onClick="{{avg12}}" aria-pressed="{{a12p}}" style="min-height: 32px; padding: 0 12px; border: none; border-left: 1px solid #CFCFC8; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; background: {{a12bg}}; color: {{a12fg}}">12 mo</button>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px">
+          <div style="display: flex; justify-content: space-between; gap: 8px"><span style="font-size: 14px; color: #3F3F46">Spending</span><span style="font-size: 16px; font-weight: 600">{{avg.sp}}</span></div>
+          <div style="display: flex; justify-content: space-between; gap: 8px"><span style="font-size: 14px; color: #3F3F46">Savings</span><span style="font-size: 16px; font-weight: 600">{{avg.saved}}</span></div>
+          <div style="display: flex; justify-content: space-between; gap: 8px"><span style="font-size: 14px; color: #3F3F46">Cash savings <span style="color: #5B5B63; font-size: 12px">after investments</span></span><span style="font-size: 16px; font-weight: 600">{{avg.cash}}</span></div>
+        </div>
+        <p style="margin: 0; font-size: 12px; color: #5B5B63; line-height: 1.5">Cash savings = income − spending − money moved to Schwab, I Bonds and other investments. Transactions you exclude don't count.</p>
+      </section>
+
+      <section aria-label="November by category" style="flex: 3 1 440px; min-width: 0; background: #FFFFFF; border: 1px solid #E4E4DF; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 10px">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap">
+          <h3 style="margin: 0; font-size: 16px; font-weight: 600">{{monthName}} by category</h3>
+          <span style="font-size: 12px; color: #5B5B63">Click categories to filter the transactions below</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 20px; row-gap: 4px">
+          <sc-for list="{{cats}}" as="c" hint-placeholder-count="10">
+            <button type="button" onClick="{{c.pick}}" aria-pressed="{{c.on}}" style="display: flex; flex-direction: column; gap: 5px; padding: 8px; border: none; border-radius: 8px; cursor: pointer; text-align: left; font-family: inherit; color: #18181B; background: {{c.bg}}; opacity: {{c.op}}">
+              <span style="display: flex; justify-content: space-between; gap: 8px; font-size: 14px"><span>{{c.name}}</span><span style="font-weight: 600">{{c.amount}}</span></span>
+              <span style="height: 6px; border-radius: 999px; background: #EFEFEA; display: block"><span style="display: block; height: 6px; border-radius: 999px; background: #F08A3C; width: {{c.w}}"></span></span>
+            </button>
+          </sc-for>
+        </div>
+      </section>
+    </div>
+
+    <section aria-label="Transactions" style="background: #FFFFFF; border: 1px solid #E4E4DF; border-radius: 12px">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid #E4E4DF">
+        <div role="group" aria-label="Transaction type" style="display: flex; gap: 6px; flex-wrap: wrap">
+          <sc-for list="{{tabs}}" as="t" hint-placeholder-count="5">
+            <button type="button" aria-pressed="{{t.selected}}" onClick="{{t.pick}}" style="min-height: 36px; padding: 0 12px; border-radius: 8px; border: 1px solid {{t.border}}; background: {{t.bg}}; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; color: {{t.fg}}">{{t.label}} <span style="font-weight: 500; opacity: 0.75">{{t.count}}</span></button>
+          </sc-for>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+          <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #3F3F46">Month
+            <select value="{{selVal}}" onChange="{{pickMonth}}" style="height: 36px; padding: 0 8px; font-family: inherit; font-size: 13px; border: 1px solid #CFCFC8; border-radius: 8px; background: #FFFFFF">
+              <sc-for list="{{monthOpts}}" as="o" hint-placeholder-count="12"><option value="{{o.v}}">{{o.label}}</option></sc-for>
+            </select>
+          </label>
+          <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #3F3F46">Sort
+            <select style="height: 36px; padding: 0 8px; font-family: inherit; font-size: 13px; border: 1px solid #CFCFC8; border-radius: 8px; background: #FFFFFF">
+              <option>Newest first</option><option>Oldest first</option><option>Amount: high to low</option><option>Amount: low to high</option><option>Merchant: A to Z</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <div style="padding: 12px 20px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; border-bottom: 1px solid #EFEFEA">
+        <span style="font-size: 15px; font-weight: 600">{{tableTitle}} <span style="font-weight: 500; color: #5B5B63; font-size: 13px">{{tableSummary}}</span></span>
+        <span style="font-size: 12px; color: #5B5B63">Click a bar or pick a month: both stay in sync. Use ⋯ on a row to exclude it.</span>
+      </div>
+      <div style="overflow-x: auto">
+        <div style="min-width: 760px">
+          <sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
+            <div style="position: relative; display: grid; grid-template-columns: 64px minmax(0, 1fr) 150px 140px 120px 36px; gap: 12px; align-items: center; padding: 11px 20px; border-bottom: 1px solid #EFEFEA; font-size: 14px; background: {{r.bg}}; color: {{r.ink}}">
+              <span style="color: #5B5B63">{{r.date}}</span>
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-width: 0">
+                <span style="font-weight: 500">{{r.desc}}</span>
+                <sc-if value="{{r.hasTag}}" hint-placeholder-val="{{ false }}">
+                  <span style="font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: {{r.tagBg}}; color: {{r.tagFg}}">{{r.tag}}</span>
+                </sc-if>
+              </div>
+              <span style="color: #5B5B63">{{r.category}}</span>
+              <span style="color: #5B5B63">{{r.account}}</span>
+              <span style="text-align: right; font-weight: 600; color: {{r.amtColor}}; text-decoration: {{r.strike}}">{{r.amount}}</span>
+              <button type="button" onClick="{{r.menu}}" aria-label="More options for {{r.desc}}" aria-expanded="{{r.menuOpen}}" style="width: 32px; height: 32px; border: none; border-radius: 6px; background: transparent; cursor: pointer; color: #A1A1AA; font-size: 18px; line-height: 1; font-family: inherit">⋯</button>
+              <sc-if value="{{r.menuOpen}}" hint-placeholder-val="{{ false }}">
+                <div style="position: absolute; right: 20px; top: 44px; z-index: 2; background: #FFFFFF; border: 1px solid #E4E4DF; border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.08); padding: 6px; width: 290px; display: flex; flex-direction: column; gap: 2px">
+                  <button type="button" onClick="{{r.flip}}" style="width: 100%; text-align: left; padding: 8px 10px; border: none; border-radius: 6px; background: #FFFFFF; font-family: inherit; cursor: pointer; color: #18181B; display: flex; flex-direction: column; gap: 2px">
+                    <span style="font-size: 14px; font-weight: 600">{{r.menuLabel}}</span>
+                    <span style="font-size: 12px; color: #5B5B63; line-height: 1.4">Leaves income, spending and savings totals. Stays in your history.</span>
+                  </button>
+                  <sc-if value="{{r.canLink}}" hint-placeholder-val="{{ false }}">
+                    <button type="button" onClick="{{r.link}}" style="width: 100%; text-align: left; padding: 8px 10px; border: none; border-top: 1px solid #EFEFEA; border-radius: 0 0 6px 6px; background: #FFFFFF; font-family: inherit; cursor: pointer; color: #18181B; display: flex; flex-direction: column; gap: 2px">
+                      <span style="font-size: 14px; font-weight: 600">{{r.linkLabel}}</span>
+                      <span style="font-size: 12px; color: #5B5B63; line-height: 1.4">Adds this amount to a manual account (like I Bonds) so net worth doesn't drop while the money is away.</span>
+                    </button>
+                  </sc-if>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { range: 6, sel: 11, avgN: 6, tab: 'all', menu: null, excluded: { tsy: true }, linked: { tsy: true }, cats: {} };
+  }
+  renderVals() {
+    const self = this;
+    const usd = function (v) { return (v < 0 ? '−' : '') + '$' + Math.abs(Math.round(v)).toLocaleString('en-US'); };
+    const names = ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'];
+    const longNames = ['December', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November'];
+    const data = [
+      [7700, 5120, 340, 1500], [7900, 4610, 120, 1500], [7700, 4480, 90, 2000], [7700, 4950, 410, 1500],
+      [8100, 4720, 200, 1500], [7700, 5060, 380, 1500], [7700, 5240, 260, 1500], [7900, 5070, 180, 2500],
+      [7700, 5280, 520, 1500], [7700, 5050, 300, 1500], [8000, 5440, 610, 1500], [8012, 4788, 412, 1500]
+    ];
+    const n = this.state.range, sel = this.state.sel;
+    const start = 12 - n;
+    const max = 8200, full = 196;
+    const h = function (v) { return Math.max(0, Math.round(v / max * full)) + 'px'; };
+    const months = [];
+    for (let i = start; i < 12; i++) {
+      const d = data.at(i);
+      const isSel = i === sel;
+      months.push({
+        label: names.at(i), incH: h(d[0]), spH: h(d[1]), retH: h(d[2]),
+        sel: isSel ? 'true' : 'false', bg: isSel ? '#E3F1EE' : 'transparent', op: isSel ? 1 : 0.75,
+        labelColor: isSel ? '#18181B' : '#5B5B63', labelWeight: isSel ? 600 : 400,
+        tip: names.at(i) + ': income ' + usd(d[0]) + ', spent ' + usd(d[1]) + ', returned ' + usd(d[2]),
+        pick: (function (k) { return function () { self.setState({ sel: k, menu: null }); }; })(i)
+      });
+    }
+    const ranges = [3, 6, 12].map(function (k) {
+      const on = k === n;
+      return { label: k + ' mo', pressed: on ? 'true' : 'false', bg: on ? '#0F6B5C' : '#FFFFFF', fg: on ? '#FFFFFF' : '#3F3F46', pick: function () { self.setState({ range: k, sel: Math.max(self.state.sel, 12 - k) }); } };
+    });
+    const c = data.at(sel);
+    const saved = c[0] - c[1];
+    const cur = {
+      sp: usd(c[1]), spNote: usd(c[1] + c[2]) + ' spent, ' + usd(c[2]) + ' returned',
+      inc: usd(c[0]), saved: usd(saved), rate: Math.round(saved / c[0] * 100) + '% of income',
+      cash: usd(saved - c[3]), cashNote: 'After ' + usd(c[3]) + ' into investments'
+    };
+    const avgN = this.state.avgN;
+    const tr = data.slice(Math.max(0, sel + 1 - avgN), sel + 1);
+    const mean = function (f) { return tr.reduce(function (s, d) { return s + f(d); }, 0) / tr.length; };
+    const avg = {
+      sp: usd(mean(function (d) { return d[1]; })),
+      saved: usd(mean(function (d) { return d[0] - d[1]; })),
+      cash: usd(mean(function (d) { return d[0] - d[1] - d[3]; }))
+    };
+    const pill = function (on) { return on ? ['true', '#0F6B5C', '#FFFFFF'] : ['false', '#FFFFFF', '#3F3F46']; };
+    const p6 = pill(avgN === 6), p12 = pill(avgN === 12);
+
+    const catData = [
+      ['Rent & mortgage', 2400], ['Groceries', 612], ['Dining', 488], ['Shopping', 401], ['Personal care', 215],
+      ['Utilities', 172], ['Other', 140], ['Hobbies', 120], ['Health', 95], ['Bills', 85], ['Pets', 60], ['Travel', 0]
+    ].map(function (x) { return [x[0], x[0] === 'Rent & mortgage' ? x[1] : Math.round(x[1] * data.at(sel)[1] / 4788)]; }).filter(function (x) { return x[1] > 0; });
+    const selCats = this.state.cats;
+    const anyCat = Object.keys(selCats).some(function (k) { return selCats[k]; });
+    const cats = catData.map(function (x) {
+      const on = !!selCats[x[0]];
+      return {
+        name: x[0], amount: usd(x[1]), w: Math.max(2, Math.round(x[1] / 2400 * 100)) + '%',
+        on: on ? 'true' : 'false', bg: on ? '#FFF1E6' : 'transparent', op: anyCat && !on ? 0.55 : 1,
+        pick: function () { const nx = Object.assign({}, self.state.cats); nx[x[0]] = !nx[x[0]]; self.setState({ cats: nx }); }
+      };
+    });
+
+    const nov = [
+      { id: 'tj', date: 'Nov 16', desc: "Whole Foods", category: 'Groceries', account: 'Amex Platinum', amt: -64.20, type: 'out' },
+      { id: 'amzr', date: 'Nov 15', desc: 'Amazon refund', category: 'Shopping', account: 'Citi', amt: 45, type: 'refund', tag: 'Matched to Nov 8 purchase' },
+      { id: 'pay2', date: 'Nov 14', desc: 'Paycheck', category: 'Income', account: 'Wells Fargo', amt: 3850, type: 'in' },
+      { id: 'rh', date: 'Nov 14', desc: 'To Schwab', category: 'Investment transfer', account: 'Wells Fargo', amt: -1500, type: 'out', auto: true, tag: 'Into investments' },
+      { id: 'tsy', date: 'Nov 14', desc: 'To I Bonds', category: 'Transfer', account: 'Discover', amt: -10000, type: 'out' },
+      { id: 'eq', date: 'Nov 13', desc: 'Equinox', category: 'Personal care', account: 'Double Cash', amt: -215, type: 'out' },
+      { id: 'wf', date: 'Nov 12', desc: 'Whole Foods', category: 'Groceries', account: 'Double Cash', amt: -86.40, type: 'out' },
+      { id: 'int', date: 'Nov 11', desc: 'Interest', category: 'Income', account: 'Ally', amt: 312.40, type: 'in' },
+      { id: 'amz', date: 'Nov 8', desc: 'Amazon', category: 'Shopping', account: 'Citi', amt: -129.99, type: 'out', tag: 'Returned $45.00', tagWarm: true },
+      { id: 'scl', date: 'Nov 6', desc: 'City Power & Light', category: 'Utilities', account: 'Wells Fargo', amt: -72.10, type: 'out' },
+      { id: 'nord', date: 'Nov 5', desc: 'Nordstrom refund', category: 'Shopping', account: 'Double Cash', amt: 67, type: 'unmatched', tag: 'Unmatched refund' },
+      { id: 'rent', date: 'Nov 3', desc: 'Rent', category: 'Rent & mortgage', account: 'Wells Fargo', amt: -2400, type: 'out' },
+      { id: 'pay1', date: 'Nov 1', desc: 'Paycheck', category: 'Income', account: 'Wells Fargo', amt: 3850, type: 'in' }
+    ];
+    const oct = [
+      { id: 'o1', date: 'Oct 30', desc: 'Sweetgreen', category: 'Dining', account: 'Amex Platinum', amt: -18.50, type: 'out' },
+      { id: 'o2', date: 'Oct 28', desc: 'From Alex', category: 'Transfer', account: 'Wells Fargo', amt: 2000, type: 'in', tag: 'Transfer · not income' },
+      { id: 'o3', date: 'Oct 21', desc: 'Patagonia refund', category: 'Shopping', account: 'Double Cash', amt: 300, type: 'refund', tag: 'Matched to Oct 3 purchase' },
+      { id: 'o4', date: 'Oct 15', desc: 'Paycheck', category: 'Income', account: 'Wells Fargo', amt: 3850, type: 'in' },
+      { id: 'o5', date: 'Oct 12', desc: 'Delta Air Lines', category: 'Travel', account: 'Double Cash', amt: -412.60, type: 'out' },
+      { id: 'o6', date: 'Oct 3', desc: 'Patagonia', category: 'Shopping', account: 'Double Cash', amt: -600, type: 'out', tag: 'Returned $300.00', tagWarm: true },
+      { id: 'o7', date: 'Oct 3', desc: 'Rent', category: 'Rent & mortgage', account: 'Wells Fargo', amt: -2400, type: 'out' },
+      { id: 'o8', date: 'Oct 1', desc: 'Paycheck', category: 'Income', account: 'Wells Fargo', amt: 3850, type: 'in' }
+    ];
+    const generic = function (mon) {
+      return [
+        { id: mon + 'g1', date: mon + ' 22', desc: 'Whole Foods', category: 'Groceries', account: 'Double Cash', amt: -142.30, type: 'out' },
+        { id: mon + 'g2', date: mon + ' 15', desc: 'Paycheck', category: 'Income', account: 'Wells Fargo', amt: 3850, type: 'in' },
+        { id: mon + 'g3', date: mon + ' 9', desc: 'Amazon refund', category: 'Shopping', account: 'Citi', amt: 38, type: 'refund', tag: 'Matched' },
+        { id: mon + 'g4', date: mon + ' 3', desc: 'Rent', category: 'Rent & mortgage', account: 'Wells Fargo', amt: -2400, type: 'out' },
+        { id: mon + 'g5', date: mon + ' 1', desc: 'Paycheck', category: 'Income', account: 'Wells Fargo', amt: 3850, type: 'in' }
+      ];
+    };
+    const tx = sel === 11 ? nov : (sel === 10 ? oct : generic(names.at(sel)));
+    const tab = this.state.tab, ex = this.state.excluded, linked = this.state.linked, menu = this.state.menu;
+    const monthTx = tx;
+    const match = function (t, k) {
+      if (anyCat && !selCats[t.category]) { return false; }
+      if (k === 'all') { return true; }
+      if (k === 'in') { return t.amt > 0; }
+      if (k === 'out') { return t.amt < 0; }
+      if (k === 'refund') { return t.type === 'refund'; }
+      return t.type === 'unmatched';
+    };
+    const defs = [['all', 'All'], ['in', 'In'], ['out', 'Out'], ['refund', 'Refunds'], ['unmatched', 'Unmatched refunds']];
+    const tabs = defs.map(function (d) {
+      const on = d[0] === tab;
+      return { label: d[1], count: String(monthTx.filter(function (t) { return match(t, d[0]); }).length), selected: on ? 'true' : 'false', bg: on ? '#0F6B5C' : '#FFFFFF', border: on ? '#0F6B5C' : '#CFCFC8', fg: on ? '#FFFFFF' : '#3F3F46', pick: function () { self.setState({ tab: d[0], menu: null }); } };
+    });
+    const money = function (v) { return (v < 0 ? '−' : '+') + '$' + Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+    const shown = tx.filter(function (t) { return match(t, tab); });
+    const rows = shown.map(function (t) {
+      const isEx = !!ex[t.id];
+      const matched = t.type === 'refund';
+      const quiet = matched || t.auto || isEx;
+      const isLinked = !!linked[t.id];
+      let tag = t.tag || '';
+      if (isEx) { tag = isLinked ? 'Excluded · added to I Bonds' : 'Excluded'; }
+      let amtColor = t.amt > 0 ? '#15803D' : '#18181B';
+      if (t.type === 'unmatched' || quiet) { amtColor = '#71717A'; }
+      if (matched) { amtColor = '#A1A1AA'; }
+      return {
+        date: t.date, desc: t.desc, category: t.category, account: t.account, amount: money(t.amt),
+        hasTag: tag !== '', tag: tag,
+        tagBg: t.tagWarm ? '#F1F1EE' : '#EFEFEA', tagFg: '#3F3F46',
+        amtColor: amtColor,
+        ink: matched ? '#A1A1AA' : (quiet ? '#52525B' : '#18181B'),
+        bg: matched ? '#FBFBF9' : '#FFFFFF',
+        strike: isEx ? 'line-through' : 'none',
+        menuOpen: menu === t.id,
+        menuLabel: isEx ? 'Include in calculations' : 'Exclude from calculations',
+        menu: function () { self.setState({ menu: self.state.menu === t.id ? null : t.id }); },
+        flip: function () { const nx = Object.assign({}, self.state.excluded); nx[t.id] = !nx[t.id]; self.setState({ excluded: nx, menu: null }); },
+        canLink: t.amt < 0 && (t.category === 'Transfer' || t.category === 'Investment transfer'),
+        linkLabel: isLinked ? 'Unlink from I Bonds' : 'Keep in net worth: add to I Bonds',
+        link: function () { const nl = Object.assign({}, self.state.linked); nl[t.id] = !nl[t.id]; const ne = Object.assign({}, self.state.excluded); if (nl[t.id]) { ne[t.id] = true; } self.setState({ linked: nl, excluded: ne, menu: null }); }
+      };
+    });
+    const catNames = Object.keys(selCats).filter(function (k) { return selCats[k]; });
+    return {
+      months: months, ranges: ranges,
+      monthTitle: longNames.at(sel) + ' 2026', monthName: longNames.at(sel),
+      cur: cur, avg: avg, avgN: avgN,
+      avg6: function () { self.setState({ avgN: 6 }); }, avg12: function () { self.setState({ avgN: 12 }); },
+      a6p: p6[0], a6bg: p6[1], a6fg: p6[2], a12p: p12[0], a12bg: p12[1], a12fg: p12[2],
+      cats: cats, tabs: tabs, rows: rows,
+      tableTitle: catNames.length ? catNames.join(', ') : longNames.at(sel) + ' transactions',
+      selVal: String(sel),
+      monthOpts: [11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0].map(function (i) { return { v: String(i), label: longNames.at(i) + (i === 0 ? ' 2025' : ' 2026') }; }),
+      pickMonth: function (e) { const k = Number(e.target.value); self.setState({ sel: k, range: k < 12 - self.state.range ? 12 : self.state.range, menu: null }); },
+      tableSummary: shown.length + ' transactions'
+    };
+  }
+}
+</script>
+</body>
+</html>

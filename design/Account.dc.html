@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>US Bank Checking</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F6F6F3}
+a{color:#0F6B5C}a:hover{color:#0B5246}
+</style>
+</helmet>
+<div style="min-height: 100vh; display: flex; flex-wrap: wrap; font-family: Inter, system-ui, sans-serif; color: #18181B; background: #F6F6F3">
+
+  <nav aria-label="Main" style="flex: 1 1 200px; max-width: 100%; box-sizing: border-box; padding: 28px 20px; display: flex; flex-direction: column; gap: 28px; background: #FFFFFF; border-right: 1px solid #E4E4DF">
+    <div style="display: flex; align-items: center; gap: 10px">
+      <div style="width: 32px; height: 32px; border-radius: 8px; background: #0F6B5C; display: flex; align-items: center; justify-content: center">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"></path><path d="M14 7h7v7"></path></svg>
+      </div>
+      <span style="font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 18px">My Money</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <a href="Main.dc.html" aria-current="page" style="text-decoration: none; padding: 10px 12px; border-radius: 8px; background: #E3F1EE; color: #0B5246; font-weight: 600; font-size: 14px">Overview</a>
+      <a href="Spending.dc.html" style="text-decoration: none; padding: 10px 12px; border-radius: 8px; color: #3F3F46; font-weight: 500; font-size: 14px">Spending</a>
+      <a href="Transactions.dc.html" style="text-decoration: none; padding: 10px 12px; border-radius: 8px; color: #3F3F46; font-weight: 500; font-size: 14px">Transactions</a>
+    </div>
+    <div style="margin-top: auto; font-size: 12px; color: #5B5B63; line-height: 1.5">Last synced today, 9:00 AM<br>5 accounts connected</div>
+  </nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 32px 40px 48px; display: flex; flex-direction: column; gap: 20px; max-width: 1240px">
+
+    <a href="Main.dc.html" style="font-size: 14px; font-weight: 500; text-decoration: none">← Back to overview</a>
+
+    <div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px">
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <h1 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 32px; font-weight: 600">US Bank Checking</h1>
+        <span style="font-size: 13px; color: #5B5B63">Plaid · synced today · In net worth</span>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px">
+        <span style="font-size: 13px; color: #5B5B63">Current balance</span>
+        <span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 36px; font-weight: 600">$8,420</span>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px">
+      <div style="background: #FFFFFF; border: 1px solid #E4E4DF; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 13px; color: #5B5B63">Money in, November</span>
+        <span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 26px; font-weight: 600; color: #0F6B5C">+$7,700.00</span>
+        <span style="font-size: 12px; color: #5B5B63">2 deposits</span>
+      </div>
+      <div style="background: #FFFFFF; border: 1px solid #E4E4DF; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 13px; color: #5B5B63">Money out, November</span>
+        <span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 26px; font-weight: 600">−$3,486.40</span>
+        <span style="font-size: 12px; color: #5B5B63">3 payments and transfers</span>
+      </div>
+      <div style="background: #FFFFFF; border: 1px solid #E4E4DF; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 13px; color: #5B5B63">Net change, November</span>
+        <span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 26px; font-weight: 600">+$4,213.60</span>
+        <span style="font-size: 12px; color: #5B5B63">In minus out</span>
+      </div>
+    </div>
+
+    <section aria-label="Account transactions" style="background: #FFFFFF; border: 1px solid #E4E4DF; border-radius: 12px; overflow: hidden">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid #E4E4DF">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 600">Transactions</h2>
+        <div role="group" aria-label="Show" style="display: flex; gap: 6px">
+          <button type="button" onClick="{{showAll}}" aria-pressed="{{allPressed}}" style="min-height: 36px; padding: 0 14px; border-radius: 999px; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid {{allBorder}}; background: {{allBg}}; color: {{allFg}}">All</button>
+          <button type="button" onClick="{{showIn}}" aria-pressed="{{inPressed}}" style="min-height: 36px; padding: 0 14px; border-radius: 999px; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid {{inBorder}}; background: {{inBg}}; color: {{inFg}}">Money in</button>
+          <button type="button" onClick="{{showOut}}" aria-pressed="{{outPressed}}" style="min-height: 36px; padding: 0 14px; border-radius: 999px; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid {{outBorder}}; background: {{outBg}}; color: {{outFg}}">Money out</button>
+        </div>
+      </div>
+      <div style="overflow-x: auto">
+        <div style="min-width: 640px">
+          <sc-for list="{{rows}}" as="r" hint-placeholder-count="7">
+            <div style="display: grid; grid-template-columns: 80px minmax(0, 1fr) 150px 140px; gap: 12px; align-items: center; padding: 14px 20px; border-bottom: 1px solid #EFEFEA; font-size: 14px">
+              <span style="color: #5B5B63">{{r.date}}</span>
+              <div style="display: flex; align-items: center; gap: 10px; min-width: 0">
+                <span style="width: 28px; height: 28px; flex: 0 0 28px; border-radius: 999px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; background: {{r.iconBg}}; color: {{r.iconFg}}" aria-hidden="true">{{r.icon}}</span>
+                <span style="font-weight: 500">{{r.desc}}</span>
+              </div>
+              <span style="color: #5B5B63">{{r.category}}</span>
+              <span style="text-align: right; font-weight: 600; color: {{r.color}}">{{r.amount}}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1100}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { f: 'all' };
+  }
+  renderVals() {
+    const self = this;
+    const f = this.state.f;
+    const data = [
+      { date: 'Nov 14', desc: 'Paycheck', category: 'Income', amt: 3850 },
+      { date: 'Nov 12', desc: 'Whole Foods', category: 'Groceries', amt: -86.40 },
+      { date: 'Nov 10', desc: 'Transfer to Ally Savings', category: 'Transfer', amt: -1000 },
+      { date: 'Nov 3', desc: 'Rent payment', category: 'Housing', amt: -2400 },
+      { date: 'Nov 1', desc: 'Paycheck', category: 'Income', amt: 3850 },
+      { date: 'Oct 28', desc: 'Transfer from Alex', category: 'Transfer · not income', amt: 2000 },
+      { date: 'Oct 14', desc: 'Sweetgreen', category: 'Dining', amt: -18.50 }
+    ];
+    const money = function (n) { return (n < 0 ? '−' : '+') + '$' + Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+    const rows = data.filter(function (d) { return f === 'all' || (f === 'in' ? d.amt > 0 : d.amt < 0); }).map(function (d) {
+      const isIn = d.amt > 0;
+      return {
+        date: d.date, desc: d.desc, category: d.category, amount: money(d.amt),
+        color: isIn ? '#0F6B5C' : '#18181B',
+        icon: isIn ? '↓' : '↑',
+        iconBg: isIn ? '#E3F1EE' : '#EFEFEA',
+        iconFg: isIn ? '#0B5246' : '#3F3F46'
+      };
+    });
+    const pill = function (on) {
+      return on ? { bg: '#0F6B5C', fg: '#FFFFFF', border: '#0F6B5C', pressed: 'true' } : { bg: '#FFFFFF', fg: '#3F3F46', border: '#CFCFC8', pressed: 'false' };
+    };
+    const a = pill(f === 'all'), i = pill(f === 'in'), o = pill(f === 'out');
+    return {
+      rows: rows,
+      allBg: a.bg, allFg: a.fg, allBorder: a.border, allPressed: a.pressed,
+      inBg: i.bg, inFg: i.fg, inBorder: i.border, inPressed: i.pressed,
+      outBg: o.bg, outFg: o.fg, outBorder: o.border, outPressed: o.pressed,
+      showAll: function () { self.setState({ f: 'all' }); },
+      showIn: function () { self.setState({ f: 'in' }); },
+      showOut: function () { self.setState({ f: 'out' }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

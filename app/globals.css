@@ -1,0 +1,141 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+    --font-heading: var(--font-grotesk);
+    --color-brand: var(--brand);
+    --color-brand-strong: var(--brand-strong);
+    --color-brand-soft: var(--brand-soft);
+    --color-brand-line: var(--brand-line);
+    --color-brand-mist: var(--brand-mist);
+    --color-ink-2: var(--ink-2);
+    --color-hairline: var(--hairline);
+    --color-field: var(--field);
+    --color-warn: var(--warn);
+    --color-warn-soft: var(--warn-soft);
+    --color-returned: var(--returned);
+    --color-income: var(--income);
+    --color-income-ink: var(--income-ink);
+    --color-spend: var(--spend);
+    --color-open: var(--open);
+    --color-open-soft: var(--open-soft);
+    --color-brand-past: var(--brand-past);
+    --color-manual: var(--manual);
+    --color-manual-soft: var(--manual-soft);
+    --font-sans: var(--font-sans);
+    --color-sidebar-ring: var(--sidebar-ring);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar: var(--sidebar);
+    --color-chart-5: var(--chart-5);
+    --color-chart-4: var(--chart-4);
+    --color-chart-3: var(--chart-3);
+    --color-chart-2: var(--chart-2);
+    --color-chart-1: var(--chart-1);
+    --color-ring: var(--ring);
+    --color-input: var(--input);
+    --color-border: var(--border);
+    --color-destructive: var(--destructive);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-accent: var(--accent);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-muted: var(--muted);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-secondary: var(--secondary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-primary: var(--primary);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-popover: var(--popover);
+    --color-card-foreground: var(--card-foreground);
+    --color-card: var(--card);
+    --color-foreground: var(--foreground);
+    --color-background: var(--background);
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-3xl: calc(var(--radius) * 2.2);
+    --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+    /* Design tokens — change these to restyle the whole app (from design/*.dc.html) */
+    --background: #F6F6F3;
+    --foreground: #18181B;
+    --card: #FFFFFF;
+    --card-foreground: #18181B;
+    --popover: #FFFFFF;
+    --popover-foreground: #18181B;
+    --primary: #0F6B5C;
+    --primary-foreground: #FFFFFF;
+    --secondary: #EFEFEA;
+    --secondary-foreground: #3F3F46;
+    --muted: #EFEFEA;
+    --muted-foreground: #5B5B63;
+    --accent: #E3F1EE;
+    --accent-foreground: #0B5246;
+    --destructive: #B42318;
+    --border: #E4E4DF;
+    --input: #CFCFC8;
+    --ring: #0F6B5C;
+    --chart-1: #0F6B5C;
+    --chart-2: #F5C9A0;
+    --chart-3: #5E9E92;
+    --chart-4: #CFCFC8;
+    --chart-5: #3F3F46;
+    --radius: 0.75rem;
+    --sidebar: #FFFFFF;
+    --sidebar-foreground: #3F3F46;
+    --sidebar-primary: #0F6B5C;
+    --sidebar-primary-foreground: #FFFFFF;
+    --sidebar-accent: #E3F1EE;
+    --sidebar-accent-foreground: #0B5246;
+    --sidebar-border: #E4E4DF;
+    --sidebar-ring: #0F6B5C;
+
+    --brand: #0F6B5C;
+    --brand-strong: #0B5246;
+    --brand-soft: #E3F1EE;
+    --brand-line: #B9DCD4;
+    --brand-mist: #F3FAF8;
+    --brand-past: #5E9E92;
+    --ink-2: #3F3F46;
+    --hairline: #EFEFEA;
+    --field: #FAFAF8;
+    --warn: #9A3412;
+    --warn-soft: #FFEDD5;
+    --returned: #B8B8B0;
+    --income: #22A05A;
+    --income-ink: #15803D;
+    --spend: #F08A3C;
+    --open: #1D5AA6;
+    --open-soft: #E6F0FB;
+    --manual: #6250D6;
+    --manual-soft: #EFEDFC;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    }
+  body {
+    @apply bg-background text-foreground;
+    }
+  html {
+    @apply font-sans;
+    }
+}
+@layer base {
+  h1, h2, h3, .font-heading { font-family: var(--font-grotesk), var(--font-sans), sans-serif; }
+  body { font-variant-numeric: tabular-nums; }
+  a { color: var(--brand); }
+  a:hover { color: var(--brand-strong); }
+}

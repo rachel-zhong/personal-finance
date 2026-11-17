@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Spending</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F6F6F3}
+a{color:#0F6B5C}a:hover{color:#0B5246}
+</style>
+</helmet>
+<div style="min-height: 100vh; display: flex; flex-wrap: wrap; font-family: Inter, system-ui, sans-serif; color: #18181B; background: #F6F6F3">
+
+  <nav aria-label="Main" style="flex: 1 1 200px; max-width: 100%; box-sizing: border-box; padding: 28px 20px; display: flex; flex-direction: column; gap: 28px; background: #FFFFFF; border-right: 1px solid #E4E4DF">
+    <div style="display: flex; align-items: center; gap: 10px">
+      <div style="width: 32px; height: 32px; border-radius: 8px; background: #0F6B5C; display: flex; align-items: center; justify-content: center">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"></path><path d="M14 7h7v7"></path></svg>
+      </div>
+      <span style="font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 18px">My Money</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <a href="Main.dc.html" style="text-decoration: none; padding: 10px 12px; border-radius: 8px; color: #3F3F46; font-weight: 500; font-size: 14px">Overview</a>
+      <a href="Spending.dc.html" aria-current="page" style="text-decoration: none; padding: 10px 12px; border-radius: 8px; background: #E3F1EE; color: #0B5246; font-weight: 600; font-size: 14px">Spending</a>
+      <a href="Transactions.dc.html" style="text-decoration: none; padding: 10px 12px; border-radius: 8px; color: #3F3F46; font-weight: 500; font-size: 14px">Transactions</a>
+    </div>
+    <div style="margin-top: auto; font-size: 12px; color: #5B5B63; line-height: 1.5">Last synced today, 9:00 AM<br>5 accounts connected</div>
+  </nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 32px 40px 48px; display: flex; flex-direction: column; gap: 20px; max-width: 1240px">
+
+    <div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px">
+      <h1 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 32px; font-weight: 600">Spending</h1>
+      <span style="font-size: 12px; font-weight: 600; color: #9A3412; background: #FFEDD5; padding: 4px 10px; border-radius: 999px">Sample data</span>
+    </div>
+
+    <section aria-label="Ask about your money" style="background: #FFFFFF; border: 1px solid #E4E4DF; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 14px">
+      <label for="ask-input" style="font-size: 14px; font-weight: 600">Ask anything about your money</label>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap">
+        <input id="ask-input" type="text" value="{{q}}" placeholder="e.g. Every transfer from Alex over $500 this year, by month" style="flex: 1 1 320px; min-width: 0; height: 44px; box-sizing: border-box; padding: 0 14px; font-family: inherit; font-size: 15px; border: 1px solid #CFCFC8; border-radius: 8px; background: #FAFAF8; color: #18181B">
+        <button type="button" style="height: 44px; padding: 0 20px; border: none; border-radius: 8px; background: #0F6B5C; color: #FFFFFF; font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer">Ask</button>
+      </div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap">
+        <button type="button" onClick="{{askMom}}" style="min-height: 36px; padding: 0 14px; border: 1px solid #CFCFC8; border-radius: 999px; background: #FFFFFF; color: #3F3F46; font-family: inherit; font-size: 13px; cursor: pointer">Transfers from Alex over $500 this year</button>
+        <button type="button" onClick="{{askLulu}}" style="min-height: 36px; padding: 0 14px; border: 1px solid #CFCFC8; border-radius: 999px; background: #FFFFFF; color: #3F3F46; font-family: inherit; font-size: 13px; cursor: pointer">Net spending at Patagonia this year</button>
+      </div>
+      <sc-if value="{{showMom}}" hint-placeholder-val="{{ false }}">
+        <div style="border-top: 1px solid #E4E4DF; padding-top: 14px; font-size: 15px"><strong>7 transfers, $9,500 total</strong> from Alex's account over $500 in 2026: Feb $2,000 · May $1,500 · Aug $4,000 · Oct $2,000.</div>
+      </sc-if>
+      <sc-if value="{{showLulu}}" hint-placeholder-val="{{ false }}">
+        <div style="border-top: 1px solid #E4E4DF; padding-top: 14px; font-size: 15px"><strong>$300 net</strong> at Patagonia in 2026: $600 bought, $300 returned. <a href="Transactions.dc.html">See the transactions</a></div>
+      </sc-if>
+    </section>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px">
+      <div style="background: #E3F1EE; border: 1px solid #B9DCD4; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 13px; color: #0B5246">November net spending</span>
+        <span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 28px; font-weight: 600">$1,988</span>
+        <span style="font-size: 12px; color: #0B5246">$2,400 spent, $412 returned</span>
+      </div>
+      <div style="background: #FFFFFF; border: 1px solid #E4E4DF; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 13px; color: #5B5B63">6-month average</span>
+        <span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 28px; font-weight: 600">$2,678</span>
+        <span style="font-size: 12px; color: #5B5B63">Net of returns, Jun to Nov</span>
+      </div>
+      <div style="background: #FFFFFF; border: 1px solid #E4E4DF; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 13px; color: #5B5B63">Returned in the last 6 months</span>
+        <span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 28px; font-weight: 600">$2,282</span>
+        <span style="font-size: 12px; color: #5B5B63">Never counted as income</span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 16px">
+      <section aria-label="Spending by month" style="flex: 3 1 460px; min-width: 0; background: #FFFFFF; border: 1px solid #E4E4DF; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 16px">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: baseline">
+          <h2 style="margin: 0; font-size: 16px; font-weight: 600">Spending by month</h2>
+          <div style="display: flex; gap: 16px; font-size: 12px; color: #5B5B63">
+            <span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #0F6B5C"></span>Net spent</span>
+            <span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #F5C9A0"></span>Returned</span>
+          </div>
+        </div>
+        <div style="display: flex; align-items: flex-end; gap: 16px; height: 220px; padding-top: 8px; border-bottom: 1px solid #E4E4DF">
+          <sc-for list="{{months}}" as="m" hint-placeholder-count="6">
+            <div style="flex: 1 1 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 6px">
+              <span style="font-size: 12px; font-weight: 600">{{m.netLabel}}</span>
+              <div style="width: 100%; max-width: 56px; display: flex; flex-direction: column">
+                <div style="height: {{m.refH}}; background: #F5C9A0; border-radius: 4px 4px 0 0"></div>
+                <div style="height: {{m.netH}}; background: {{m.color}}"></div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display: flex; gap: 16px">
+          <sc-for list="{{months}}" as="m" hint-placeholder-count="6">
+            <span style="flex: 1 1 0; text-align: center; font-size: 12px; color: #5B5B63">{{m.label}}</span>
+          </sc-for>
+        </div>
+        <p style="margin: 0; font-size: 12px; color: #5B5B63">Returns count in the month of the original purchase, so each bar shows what you really kept.</p>
+      </section>
+
+      <section aria-label="November by category" style="flex: 2 1 320px; min-width: 0; background: #FFFFFF; border: 1px solid #E4E4DF; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 14px">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 600">November by category</h2>
+        <sc-for list="{{cats}}" as="c" hint-placeholder-count="6">
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <div style="display: flex; justify-content: space-between; gap: 8px; font-size: 14px">
+              <span>{{c.name}}</span>
+              <span style="font-weight: 600">{{c.amount}}</span>
+            </div>
+            <div style="height: 8px; border-radius: 999px; background: #EFEFEA">
+              <div style="height: 8px; border-radius: 999px; background: #0F6B5C; width: {{c.w}}"></div>
+            </div>
+            <span style="font-size: 12px; color: #5B5B63">{{c.note}}</span>
+          </div>
+        </sc-for>
+      </section>
+    </div>
+
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1240}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { which: null };
+  }
+  renderVals() {
+    const self = this;
+    const data = [
+      { label: 'Jun', gross: 3100, ret: 260 },
+      { label: 'Jul', gross: 2850, ret: 180 },
+      { label: 'Aug', gross: 3400, ret: 520 },
+      { label: 'Sep', gross: 2950, ret: 300 },
+      { label: 'Oct', gross: 3650, ret: 610 },
+      { label: 'Nov', gross: 2400, ret: 412 }
+    ];
+    const max = 3650, full = 180;
+    const months = data.map(function (d, i) {
+      const net = d.gross - d.ret;
+      return {
+        label: d.label,
+        netLabel: '$' + net.toLocaleString('en-US'),
+        netH: Math.round(net / max * full) + 'px',
+        refH: Math.round(d.ret / max * full) + 'px',
+        color: i === data.length - 1 ? '#0F6B5C' : '#5E9E92'
+      };
+    });
+    const catData = [
+      { name: 'Groceries', v: 612, note: '14 transactions' },
+      { name: 'Dining', v: 488, note: '11 transactions' },
+      { name: 'Shopping', v: 401, note: 'After $412 in returns' },
+      { name: 'Transport', v: 214, note: '6 transactions' },
+      { name: 'Other', v: 177, note: '5 transactions' },
+      { name: 'Subscriptions', v: 96, note: '4 transactions' }
+    ];
+    const top = 612;
+    const cats = catData.map(function (c) {
+      return { name: c.name, amount: '$' + c.v.toLocaleString('en-US'), note: c.note, w: Math.round(c.v / top * 100) + '%' };
+    });
+    const w = this.state.which;
+    const qs = { mom: 'Every transfer from Alex over $500 this year, by month', lulu: 'Net spending at Patagonia this year' };
+    return {
+      months: months,
+      cats: cats,
+      q: w ? qs[w] : '',
+      showMom: w === 'mom',
+      showLulu: w === 'lulu',
+      askMom: function () { self.setState({ which: 'mom' }); },
+      askLulu: function () { self.setState({ which: 'lulu' }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

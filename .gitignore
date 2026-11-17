@@ -1,0 +1,23 @@
+node_modules/
+.next/
+.next-demo/
+next-env.d.ts
+*.tsbuildinfo
+
+# Local financial data and credentials: never commit
+data/
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+secrets/
+.env
+.env.*
+!.env.example
+
+# OS and local tool settings
+.DS_Store
+.claude/
+
+# Exported design canvases (sample data names real institutions); the design/*.dc.html files cover the same designs
+Finance App Mockups.html

@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Overview</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F6F6F3}
+a{color:#0F6B5C}a:hover{color:#0B5246}
+</style>
+</helmet>
+<div style="min-height: 100vh; display: flex; flex-wrap: wrap; font-family: Inter, system-ui, sans-serif; color: #18181B; background: #F6F6F3">
+
+  <nav aria-label="Main" style="flex: 1 1 200px; max-width: 100%; box-sizing: border-box; padding: 28px 20px; display: flex; flex-direction: column; gap: 28px; background: #FFFFFF; border-right: 1px solid #E4E4DF">
+    <div style="display: flex; align-items: center; gap: 10px">
+      <div style="width: 32px; height: 32px; border-radius: 8px; background: #0F6B5C; display: flex; align-items: center; justify-content: center">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"></path><path d="M14 7h7v7"></path></svg>
+      </div>
+      <span style="font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 18px">My Money</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <a href="Main.dc.html" aria-current="page" style="text-decoration: none; padding: 10px 12px; border-radius: 8px; background: #E3F1EE; color: #0B5246; font-weight: 600; font-size: 14px">Overview</a>
+      <a href="Spending.dc.html" style="text-decoration: none; padding: 10px 12px; border-radius: 8px; color: #3F3F46; font-weight: 500; font-size: 14px">Spending</a>
+      <a href="Transactions.dc.html" style="text-decoration: none; padding: 10px 12px; border-radius: 8px; color: #3F3F46; font-weight: 500; font-size: 14px">Transactions</a>
+    </div>
+    <div style="margin-top: auto; font-size: 12px; color: #5B5B63; line-height: 1.5">Last synced today, 9:00 AM<br>5 accounts connected</div>
+  </nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 32px 40px 48px; display: flex; flex-direction: column; gap: 20px; max-width: 1240px">
+
+    <div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px">
+      <h1 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 32px; font-weight: 600">Overview</h1>
+      <span style="font-size: 12px; font-weight: 600; color: #9A3412; background: #FFEDD5; padding: 4px 10px; border-radius: 999px">Sample data</span>
+    </div>
+
+    <section aria-label="Net worth" style="background: #FFFFFF; border: 1px solid #E4E4DF; border-radius: 16px; padding: 28px; display: flex; flex-wrap: wrap; gap: 28px; align-items: stretch">
+      <div style="flex: 1 1 260px; min-width: 0; display: flex; flex-direction: column; gap: 10px">
+        <span style="font-size: 14px; font-weight: 600; color: #3F3F46">Net worth</span>
+        <span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 52px; font-weight: 600; line-height: 1">{{netWorth}}</span>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
+          <span style="font-size: 13px; font-weight: 600; color: #0B5246; background: #E3F1EE; padding: 4px 10px; border-radius: 999px">{{mom}}</span>
+          <span style="font-size: 13px; color: #5B5B63">vs. end of October</span>
+        </div>
+        <p style="margin: 6px 0 0; font-size: 13px; color: #5B5B63; line-height: 1.5">Cash and investments minus card balances. Excludes family money and any account you hide.</p>
+      </div>
+      <div style="flex: 2 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 8px">
+        <span style="font-size: 12px; font-weight: 600; color: #5B5B63">Month over month, last 12 months</span>
+        <svg viewBox="0 0 640 160" preserveAspectRatio="none" role="img" aria-label="Net worth trend over the last 12 months" style="width: 100%; height: 160px; display: block">
+          <line x1="0" y1="152" x2="640" y2="152" stroke="#E4E4DF" stroke-width="1"></line>
+          <path d="{{areaPath}}" fill="#E3F1EE"></path>
+          <polyline points="{{linePoints}}" fill="none" stroke="#0F6B5C" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"></polyline>
+        </svg>
+        <div style="display: flex; justify-content: space-between">
+          <sc-for list="{{trend}}" as="t" hint-placeholder-count="12">
+            <span style="font-size: 11px; color: #5B5B63; width: 0; display: flex; justify-content: center; white-space: nowrap">{{t.label}}</span>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px">
+      <div style="background: #FFFFFF; border: 1px solid #E4E4DF; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 13px; color: #5B5B63">Cash and savings</span>
+        <span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 26px; font-weight: 600">{{cashTotal}}</span>
+        <span style="font-size: 12px; color: #5B5B63">US Bank, Discover, Ally</span>
+      </div>
+      <div style="background: #FFFFFF; border: 1px dashed #CFCFC8; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 13px; color: #5B5B63">Family money</span>
+        <span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 26px; font-weight: 600">{{parentsTotal}}</span>
+        <span style="font-size: 12px; color: #5B5B63">{{parentsNote}}</span>
+      </div>
+      <div style="background: #FFFFFF; border: 1px solid #E4E4DF; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 13px; color: #5B5B63">Investments and retirement</span>
+        <span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 26px; font-weight: 600">{{investTotal}}</span>
+        <span style="font-size: 12px; color: #5B5B63">Schwab, Vanguard, company 401k</span>
+      </div>
+    </div>
+
+    <section aria-label="Accounts" style="background: #FFFFFF; border: 1px solid #E4E4DF; border-radius: 12px; padding: 20px 24px; display: flex; flex-direction: column; gap: 8px">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px">
+        <h2 style="margin: 0; font-size: 18px; font-weight: 600">Accounts</h2>
+        <button type="button" onClick="{{openAdd}}" style="min-height: 40px; padding: 0 16px; border: 1px solid #0F6B5C; border-radius: 8px; background: #FFFFFF; color: #0F6B5C; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer">+ Add account manually</button>
+      </div>
+
+      <sc-if value="{{showAdd}}" hint-placeholder-val="{{ false }}">
+        <div style="border: 1px solid #B9DCD4; background: #F3FAF8; border-radius: 10px; padding: 16px; display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end">
+          <div style="display: flex; flex-direction: column; gap: 6px; flex: 2 1 200px; min-width: 0">
+            <label for="add-name" style="font-size: 12px; font-weight: 600; color: #3F3F46">Account name</label>
+            <input id="add-name" type="text" value="{{formName}}" onChange="{{setName}}" placeholder="e.g. Old company 401k" style="height: 44px; box-sizing: border-box; padding: 0 12px; font-family: inherit; font-size: 14px; border: 1px solid #CFCFC8; border-radius: 8px; background: #FFFFFF">
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px; flex: 1 1 180px; min-width: 0">
+            <label for="add-group" style="font-size: 12px; font-weight: 600; color: #3F3F46">Type</label>
+            <select id="add-group" value="{{formGroup}}" onChange="{{setGroup}}" style="height: 44px; box-sizing: border-box; padding: 0 10px; font-family: inherit; font-size: 14px; border: 1px solid #CFCFC8; border-radius: 8px; background: #FFFFFF">
+              <option value="cash">Cash and savings</option>
+              <option value="parents">Family money</option>
+              <option value="invest">Investments and retirement</option>
+              <option value="cards">Credit card</option>
+            </select>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px; flex: 1 1 140px; min-width: 0">
+            <label for="add-bal" style="font-size: 12px; font-weight: 600; color: #3F3F46">Current balance</label>
+            <input id="add-bal" type="text" inputmode="decimal" value="{{formBal}}" onChange="{{setBal}}" placeholder="$0" style="height: 44px; box-sizing: border-box; padding: 0 12px; font-family: inherit; font-size: 14px; border: 1px solid #CFCFC8; border-radius: 8px; background: #FFFFFF">
+          </div>
+          <button type="button" onClick="{{addAccount}}" style="height: 44px; padding: 0 18px; border: none; border-radius: 8px; background: #0F6B5C; color: #FFFFFF; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer">Add</button>
+          <button type="button" onClick="{{closeAdd}}" style="height: 44px; padding: 0 14px; border: 1px solid #CFCFC8; border-radius: 8px; background: #FFFFFF; color: #3F3F46; font-family: inherit; font-size: 14px; cursor: pointer">Cancel</button>
+          <p style="flex: 1 1 100%; margin: 0; font-size: 12px; color: #5B5B63">Manual accounts count toward net worth like any other. Update the balance whenever you check the statement.</p>
+        </div>
+      </sc-if>
+
+      <sc-for list="{{groups}}" as="g" hint-placeholder-count="4">
+        <div style="display: flex; flex-direction: column; padding-top: 12px">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; padding: 6px 0; border-bottom: 1px solid #E4E4DF">
+            <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #5B5B63">{{g.label}}</span>
+            <span style="font-size: 12px; font-weight: 600; color: #5B5B63">{{g.total}}</span>
+          </div>
+          <sc-for list="{{g.items}}" as="a" hint-placeholder-count="3">
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #EFEFEA">
+              <div style="flex: 1 1 220px; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+                <a href="Account.dc.html" style="text-decoration: none; font-size: 15px; font-weight: 500; color: {{a.nameColor}}">{{a.name}}</a>
+                <span style="font-size: 12px; color: #5B5B63">{{a.meta}}</span>
+              </div>
+              <span style="flex: 0 0 auto; min-width: 110px; text-align: right; font-size: 15px; font-weight: 600; color: {{a.nameColor}}">{{a.balance}}</span>
+              <div style="flex: 0 0 170px; display: flex; align-items: center; justify-content: flex-end; gap: 10px">
+                <span style="font-size: 12px; color: #5B5B63">{{a.toggleLabel}}</span>
+                <button type="button" role="switch" aria-checked="{{a.included}}" aria-label="Include {{a.name}} in net worth" onClick="{{a.toggle}}" style="width: 44px; height: 26px; border: none; border-radius: 999px; padding: 3px; cursor: pointer; display: flex; justify-content: {{a.knobSide}}; background: {{a.trackColor}}">
+                  <span style="width: 20px; height: 20px; border-radius: 999px; background: #FFFFFF"></span>
+                </button>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+      <p style="margin: 8px 0 0; font-size: 12px; color: #5B5B63">Click an account to see every transaction in and out. Turn the switch off to hide an account from net worth.</p>
+    </section>
+
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1500}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { hidden: { parents: true }, extra: [], showAdd: false, formName: '', formGroup: 'invest', formBal: '' };
+  }
+  renderVals() {
+    const self = this;
+    const fmt = function (n) { return (n < 0 ? '−' : '') + '$' + Math.abs(Math.round(n)).toLocaleString('en-US'); };
+    const base = [
+      { id: 'chase', group: 'cash', name: 'US Bank Checking', meta: 'Plaid · synced today', bal: 8420 },
+      { id: 'cap360', group: 'cash', name: 'Discover 360 Savings', meta: 'Plaid · synced today', bal: 12300 },
+      { id: 'ally', group: 'cash', name: 'Ally Online Savings', meta: 'Plaid · synced today', bal: 21460 },
+      { id: 'parents', group: 'parents', name: 'Discover Savings · Parents', meta: 'Plaid · managed for my parents', bal: 24000 },
+      { id: 'robinhood', group: 'invest', name: 'Schwab', meta: 'Sync in Phase 3', bal: 38900 },
+      { id: 'fidelity', group: 'invest', name: 'Vanguard 401k', meta: 'Sync in Phase 3', bal: 61420 },
+      { id: 'co401k', group: 'invest', name: 'Company 401k', meta: 'Manual · updated Oct 31', bal: 41750 },
+      { id: 'boa', group: 'cards', name: 'Wells Fargo Card', meta: 'Plaid · synced today', bal: -1240 },
+      { id: 'venture', group: 'cards', name: 'Discover Venture Card', meta: 'Plaid · synced today', bal: -760 }
+    ];
+    const all = base.concat(this.state.extra);
+    const hidden = this.state.hidden;
+    const isIn = function (a) { return !hidden[a.id]; };
+    const sumGroup = function (g) { return all.filter(function (a) { return a.group === g; }).reduce(function (s, a) { return s + a.bal; }, 0); };
+    const net = all.filter(isIn).reduce(function (s, a) { return s + a.bal; }, 0);
+
+    const toggle = function (id) {
+      return function () {
+        const next = Object.assign({}, self.state.hidden);
+        next[id] = !next[id];
+        self.setState({ hidden: next });
+      };
+    };
+    const labels = { cash: 'Cash and savings', parents: "Family money", invest: 'Investments and retirement', cards: 'Credit cards' };
+    const groups = ['cash', 'parents', 'invest', 'cards'].map(function (g) {
+      return {
+        label: labels[g],
+        total: fmt(sumGroup(g)),
+        items: all.filter(function (a) { return a.group === g; }).map(function (a) {
+          const inc = isIn(a);
+          return {
+            name: a.name, meta: a.meta, balance: fmt(a.bal),
+            included: inc ? 'true' : 'false',
+            toggleLabel: inc ? 'In net worth' : 'Hidden',
+            nameColor: inc ? '#18181B' : '#8A8A93',
+            trackColor: inc ? '#0F6B5C' : '#CFCFC8',
+            knobSide: inc ? 'flex-end' : 'flex-start',
+            toggle: toggle(a.id)
+          };
+        })
+      };
+    });
+
+    const history = [158400, 160900, 159200, 163800, 166500, 168100, 171900, 170400, 174800, 177300, 179600];
+    const series = history.concat([net]);
+    const monthNames = ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'];
+    const lo = Math.min.apply(null, series) * 0.98, hi = Math.max.apply(null, series) * 1.01;
+    const pts = series.map(function (v, i) {
+      const x = i / (series.length - 1) * 640;
+      const y = 148 - (v - lo) / (hi - lo) * 132;
+      return Math.round(x) + ',' + Math.round(y);
+    });
+    const linePoints = pts.join(' ');
+    const areaPath = 'M0,152 L' + pts.join(' L') + ' L640,152 Z';
+    const prev = history[history.length - 1];
+    const diff = net - prev;
+    const pct = (diff / prev * 100).toFixed(1);
+
+    const parentsIn = !hidden.parents;
+    return {
+      netWorth: fmt(net),
+      mom: (diff >= 0 ? '+' : '−') + '$' + Math.abs(diff).toLocaleString('en-US') + ' (' + (diff >= 0 ? '+' : '') + pct + '%)',
+      linePoints: linePoints,
+      areaPath: areaPath,
+      trend: monthNames.map(function (m) { return { label: m }; }),
+      cashTotal: fmt(sumGroup('cash')),
+      parentsTotal: fmt(sumGroup('parents')),
+      parentsNote: parentsIn ? 'Currently included in net worth' : 'Not counted in net worth',
+      investTotal: fmt(sumGroup('invest')),
+      groups: groups,
+      showAdd: this.state.showAdd,
+      formName: this.state.formName,
+      formGroup: this.state.formGroup,
+      formBal: this.state.formBal,
+      openAdd: function () { self.setState({ showAdd: true }); },
+      closeAdd: function () { self.setState({ showAdd: false }); },
+      setName: function (e) { self.setState({ formName: e.target.value }); },
+      setGroup: function (e) { self.setState({ formGroup: e.target.value }); },
+      setBal: function (e) { self.setState({ formBal: e.target.value }); },
+      addAccount: function () {
+        const amt = parseFloat(String(self.state.formBal).replace(/[^0-9.\-]/g, ''));
+        if (!self.state.formName || isNaN(amt)) { return; }
+        const g = self.state.formGroup;
+        const bal = g === 'cards' ? -Math.abs(amt) : amt;
+        const acct = { id: 'm' + Date.now(), group: g, name: self.state.formName, meta: 'Manual · added today', bal: bal };
+        const nextHidden = Object.assign({}, self.state.hidden);
+        if (g === 'parents') { nextHidden[acct.id] = true; }
+        self.setState({ extra: self.state.extra.concat([acct]), hidden: nextHidden, showAdd: false, formName: '', formBal: '' });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>
