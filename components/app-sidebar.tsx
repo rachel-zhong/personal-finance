@@ -2,6 +2,7 @@ import { getDb } from "@/lib/db";
 import { syncedLabel } from "@/lib/format";
 import NavLinks from "./nav-links";
 import SyncButton from "./SyncButton";
+import Copyright from "./copyright";
 
 export default async function AppSidebar({ showPay = true }: { showPay?: boolean }) {
   const db = getDb();
@@ -25,6 +26,7 @@ export default async function AppSidebar({ showPay = true }: { showPay?: boolean
           {s?.n ?? 0} connection{s?.n === 1 ? "" : "s"}
         </div>
         <SyncButton />
+        <Copyright className="border-t border-border pt-3" />
       </div>
     </nav>
   );

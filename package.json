@@ -2,6 +2,8 @@
   "name": "finance-app",
   "version": "0.1.0",
   "private": true,
+  "license": "SEE LICENSE IN LICENSE",
+  "author": "rachel-zhong (https://github.com/rachel-zhong)",
   "type": "module",
   "scripts": {
     "dev": "NEXT_TELEMETRY_DISABLED=1 next dev -H 127.0.0.1 -p 3000",

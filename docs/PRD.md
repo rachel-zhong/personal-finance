@@ -7,6 +7,7 @@ This is the single source of truth. It describes what the app does today, tab by
 - **Status:** everything here is built unless it's marked _Not built_.
 - **Requirement IDs:** tab code + number (NW-1, SP-2 …). IDs from earlier drafts are kept where they still apply.
 - **Examples:** every number and name in an example is made up.
+- **Ownership:** © 2026 rachel-zhong. All rights reserved. See [LICENSE](../LICENSE).
 
 **Contents**
 

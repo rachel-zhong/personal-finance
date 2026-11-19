@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Copyright from "@/components/copyright";
 
 export default function LoginForm({ next, needCode }: { next: string; needCode: boolean }) {
   const [password, setPassword] = useState("");
@@ -49,6 +50,7 @@ export default function LoginForm({ next, needCode }: { next: string; needCode: 
       {err && <p role="alert" className="text-sm text-warn">{err}</p>}
       <Button type="submit" disabled={busy} className="h-11 font-semibold">{busy ? "Checking…" : "Log in"}</Button>
       <p className="text-[11px] text-muted-foreground">Stays signed in on this device for 30 days.</p>
+      <Copyright className="border-t border-border pt-3" />
     </form>
   );
 }

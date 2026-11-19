@@ -206,3 +206,7 @@ Never add a bank you already have as a new connection. Use **Re-connect** on the
 | "The server already has N connections" | Data is already on Railway, protected from overwriting | Add `--replace` only if you mean to overwrite |
 | "Too many wrong tries" | The 15-minute lock | Wait 15 minutes |
 | Plaid shows a redirect error | Step 7 done in the wrong order | Add the address in Plaid first, then the variable |
+
+---
+
+© 2026 rachel-zhong. All rights reserved. See [LICENSE](../LICENSE).

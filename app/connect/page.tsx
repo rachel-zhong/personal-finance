@@ -6,6 +6,7 @@ import PlaidLinkButton from "@/components/PlaidLinkButton";
 import { investmentConnections } from "@/lib/investments";
 import PayUpload from "@/components/files/pay-upload";
 import LogoutButton from "@/components/logout-button";
+import Copyright from "@/components/copyright";
 import { authEnabled, payUploadsEnabled } from "@/lib/hosted";
 
 export const dynamic = "force-dynamic";
@@ -86,6 +87,7 @@ export default async function ConnectPage() {
           <LogoutButton />
         </section>
       )}
+      <Copyright className="text-center" />
     </>
   );
 }

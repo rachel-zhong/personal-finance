@@ -18,6 +18,8 @@ export const metadata: Metadata = {
   title: "My Money",
   description: "Local personal finance dashboard",
   applicationName: "My Money",
+  authors: [{ name: "rachel-zhong", url: "https://github.com/rachel-zhong" }],
+  creator: "rachel-zhong",
   // Home-screen app on iPhone: opens full-screen, with its own icon and name
   appleWebApp: { capable: true, title: "Money", statusBarStyle: "default" },
   icons: { icon: [{ url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }], apple: "/icons/apple-touch-icon.png" },
