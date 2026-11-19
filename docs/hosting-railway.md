@@ -184,6 +184,37 @@ Never add a bank you already have as a new connection. Use **Re-connect** on the
 
 ---
 
+## Optional · Compensation on your phone
+
+- **What:** shows the Compensation tab on the website, while your pay **PDFs stay on your Mac**.
+- **How it works:** your Mac reads the PDFs (as it does today). One command then sends only the resulting **numbers** (salary, taxes, RSUs, take-home) to the website. The website never receives or needs the PDFs.
+- **The trade-off:** the numbers are stored on Railway, behind your login. The documents are not.
+
+**Turn it on (once):**
+
+1. Railway → `personal-finance` → **Variables** → set `HOSTED_INCLUDE_COMPENSATION` to `true` → deploy.
+2. **You'll know it worked:** the website's menu shows **Compensation** ("Pay" on your phone). It's empty until step 3.
+3. On your Mac, in Terminal:
+   ```bash
+   cd ~/Documents/finance-app
+   ```
+   ```bash
+   npm run hosted:pay -- https://YOUR-APP-ADDRESS
+   ```
+4. Type your app password, press Enter for the code (if you skipped Step 5).
+5. **You'll know it worked:** Terminal says **✓ Pay numbers updated online**, and the Compensation tab matches your Mac.
+
+**Each time you get new pay documents:**
+
+1. On your Mac: drop the PDFs in the app (Connections & files, or the bottom of Compensation).
+2. Run the same `npm run hosted:pay -- https://YOUR-APP-ADDRESS` command.
+
+**What it touches online:** only pay numbers. Bank data, transactions and anything you changed online stay as they are.
+
+**Turn it off later:** set `HOSTED_INCLUDE_COMPENSATION` back to `false`. The tab disappears and new pay numbers are refused. (The numbers already sent stay on the drive. Ask Claude if you want them deleted.)
+
+---
+
 ## Everyday use
 
 | Situation | What happens |
@@ -194,7 +225,7 @@ Never add a bank you already have as a new connection. Use **Re-connect** on the
 | Log out | Connections & files → **Log out on this device**. |
 | Log out every device | Change `APP_PASSWORD` (or `SESSION_SECRET`) in Railway, then deploy. |
 | Your Mac app | Keeps working, with its own separate copy of the data. Edits made online don't copy back to the Mac, so pick one as your main place. |
-| Pay data online later | Set `HOSTED_INCLUDE_COMPENSATION=true`, then rerun Step 6 with `--replace --include-pay`. Pay documents are still added on your Mac. |
+| Compensation tab online | See "Optional · Compensation on your phone" below. |
 
 ## If something goes wrong
 

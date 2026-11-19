@@ -21,7 +21,8 @@
     "comp:check": "tsx scripts/compensation/check.ts",
     "start:hosted": "NEXT_TELEMETRY_DISABLED=1 next start -H 0.0.0.0 -p ${PORT:-3000}",
     "hosted:upload": "tsx scripts/hosted/upload.ts",
-    "hosted:authenticator": "tsx scripts/hosted/authenticator.ts"
+    "hosted:authenticator": "tsx scripts/hosted/authenticator.ts",
+    "hosted:pay": "tsx scripts/hosted/pay.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

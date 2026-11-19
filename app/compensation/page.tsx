@@ -100,7 +100,7 @@ export default async function CompensationPage({ searchParams }: { searchParams:
         <h1 className="text-[32px] font-semibold">Compensation</h1>
         <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5 text-sm text-ink-2">
           No pay data yet.{" "}
-          {uploads ? <>Add your pay statements and W-2s to get started.<PayUpload /></> : "Add pay documents in the app on your Mac, then upload the data again."}
+          {uploads ? <>Add your pay statements and W-2s to get started.<PayUpload /></> : "Add pay documents in the app on your Mac, then run npm run hosted:pay to send the numbers here."}
         </div>
       </>
     );

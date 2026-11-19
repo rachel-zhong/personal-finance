@@ -15,44 +15,17 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import readline from "node:readline";
+import { appOrigin, login, reportFailure } from "./common";
 import Database from "better-sqlite3";
 
 const PAY_TABLES = ["comp_rsu_vests", "comp_lines", "comp_deposits", "comp_statements", "comp_w2", "comp_base_pay"];
-
-// One reader for every question. Lines are queued, so answers typed (or pasted) quickly all arrive in order.
-let rl: readline.Interface | null = null;
-let muted = false;
-const lines: string[] = [];
-const waiting: ((s: string) => void)[] = [];
-function ask(question: string, hidden = false): Promise<string> {
-  if (!rl) {
-    rl = readline.createInterface({ input: process.stdin, output: process.stdout, terminal: !!process.stdin.isTTY });
-    const r = rl as unknown as { _writeToOutput: (s: string) => void };
-    const write = r._writeToOutput.bind(rl);
-    r._writeToOutput = (s: string) => { if (!muted) write(s); }; // hides the password as you type
-    rl.on("line", (l) => { const w = waiting.shift(); if (w) w(l); else lines.push(l); });
-  }
-  process.stdout.write(question);
-  muted = hidden;
-  return new Promise((resolve) => {
-    const done = (a: string) => { if (muted) process.stdout.write("\n"); muted = false; resolve(a.trim()); };
-    const queued = lines.shift();
-    if (queued !== undefined) done(queued); else waiting.push(done);
-  });
-}
 
 async function main() {
   const args = process.argv.slice(2);
   const url = args.find((a) => !a.startsWith("--"));
   const replace = args.includes("--replace");
   const includePay = args.includes("--include-pay");
-  if (!url) { console.log("Usage: npm run hosted:upload -- https://<your-app>.up.railway.app"); process.exit(1); }
-  const base = new URL(url);
-  if (base.protocol !== "https:" && !["localhost", "127.0.0.1"].includes(base.hostname)) {
-    console.log("Use the https:// address, so your data is encrypted on the way."); process.exit(1);
-  }
-  const origin = base.origin;
+  const origin = appOrigin(url, "npm run hosted:upload -- https://<your-app>.up.railway.app");
 
   const dbFile = process.env.DATABASE_PATH || path.join(process.cwd(), "data", "finance.db");
   const secFile = process.env.SECRETS_PATH || path.join(process.cwd(), "secrets", "plaid-tokens.json");
@@ -77,14 +50,7 @@ async function main() {
     c.close();
 
     // 3. Log in
-    const password = await ask("App password: ", true);
-    const code = await ask("Authenticator code (press Enter if you didn't set one up): ");
-    rl?.close();
-    const login = await fetch(`${origin}/api/auth/login`, {
-      method: "POST", headers: { "Content-Type": "application/json", Origin: origin }, body: JSON.stringify({ password, code }),
-    });
-    if (!login.ok) { console.log(`Login failed: ${(await login.json().catch(() => ({}))).error ?? login.status}`); process.exit(1); }
-    const cookie = (login.headers.get("set-cookie") ?? "").split(";")[0];
+    const cookie = await login(origin);
 
     // 4. Upload
     const form = new FormData();
@@ -103,9 +69,4 @@ async function main() {
   }
 }
 
-main().catch((e: Error & { cause?: { code?: string } }) => {
-  console.log(e.message === "fetch failed"
-    ? `Couldn't reach the app (${e.cause?.code ?? "network error"}). Check the address and that the Railway deploy is running.`
-    : `Stopped: ${e.message}`);
-  process.exit(1);
-});
+main().catch(reportFailure);
