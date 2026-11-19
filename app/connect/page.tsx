@@ -9,7 +9,7 @@ import LogoutButton from "@/components/logout-button";
 import Copyright from "@/components/copyright";
 import WebsiteLink from "@/components/files/website-link";
 import { getLink } from "@/lib/website-link";
-import { authEnabled, isHosted, payUploadsEnabled } from "@/lib/hosted";
+import { authEnabled, isDemo, isHosted, payUploadsEnabled } from "@/lib/hosted";
 
 export const dynamic = "force-dynamic";
 
@@ -39,7 +39,9 @@ export default async function ConnectPage() {
       )}
 
       <section className="rounded-xl border border-border bg-card p-5">
-        <PlaidLinkButton />
+        {isDemo()
+          ? <p className="text-sm text-muted-foreground">This is a demo with made-up data, so connecting banks is turned off. In the real app, banks connect here through Plaid (read-only).</p>
+          : <PlaidLinkButton />}
       </section>
 
       {payUploadsEnabled() && <section aria-label="Pay documents" className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5">

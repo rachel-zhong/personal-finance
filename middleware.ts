@@ -17,6 +17,7 @@ import { SESSION_COOKIE, payLinkValid, sessionValid } from "@/lib/auth";
  *    - over Tailscale, only this Mac's own *.ts.net address (set by `npm run phone`)
  */
 const TS_SUFFIX = ".ts.net";
+const DEMO_OFF = [/^\/api\/sync$/, /^\/api\/plaid\//, /^\/api\/admin\//, /^\/api\/investments\/(refresh|enable)$/, /^\/api\/files\//, /^\/api\/website\//];
 const PUBLIC = [/^\/login$/, /^\/api\/auth\/login$/, /^\/api\/health$/, /^\/manifest\.webmanifest$/, /^\/icons\//, /^\/favicon\.ico$/];
 
 function sameSite(req: NextRequest) {
@@ -50,6 +51,11 @@ export function middleware(req: NextRequest) {
       url.search = path === "/" ? "" : `?next=${encodeURIComponent(path + req.nextUrl.search)}`;
       return NextResponse.redirect(url);
     }
+  }
+
+  // Demo website: nothing that reaches banks, uploads data or changes the setup
+  if (process.env.DEMO === "1" && isApi && req.method !== "GET" && DEMO_OFF.some((re) => re.test(path))) {
+    return NextResponse.json({ error: "Turned off in the demo (sample data only)" }, { status: 403 });
   }
 
   if (isApi && req.method !== "GET" && req.method !== "HEAD" && !sameSite(req)) {

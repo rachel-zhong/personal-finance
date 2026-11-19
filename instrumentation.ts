@@ -1,6 +1,7 @@
-/** Runs once when the server starts. On a server (Railway), turns on the daily sync (see instrumentation-node.ts). */
+/** Runs once when the server starts. Server only: the daily sync, or the demo's sample data (see instrumentation-node.ts). */
 export async function register() {
   if (process.env.NEXT_RUNTIME === "nodejs") {
-    await import("./instrumentation-node");
+    const { start } = await import("./instrumentation-node");
+    await start();
   }
 }

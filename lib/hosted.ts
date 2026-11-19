@@ -8,6 +8,11 @@ export function isHosted() {
   return process.env.HOSTED === "1" || !!process.env.RAILWAY_ENVIRONMENT_NAME;
 }
 
+/** The demo website (DEMO=1): made-up data, rebuilt on every start and every night; banks and uploads turned off. */
+export function isDemo() {
+  return process.env.DEMO === "1";
+}
+
 /** Login is on whenever a password is set (always set it when hosted). */
 export function authEnabled() {
   return !!process.env.APP_PASSWORD;
@@ -18,7 +23,7 @@ export function authEnabled() {
  * When off, the Compensation tab and every pay route are hidden.
  */
 export function compensationEnabled() {
-  return !isHosted() || process.env.HOSTED_INCLUDE_COMPENSATION === "true";
+  return isDemo() || !isHosted() || process.env.HOSTED_INCLUDE_COMPENSATION === "true";
 }
 
 /** Reading pay PDFs needs Apple's PDFKit and Vision, so uploads only work on a Mac. */

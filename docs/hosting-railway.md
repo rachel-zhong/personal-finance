@@ -217,6 +217,47 @@ Never add a bank you already have as a new connection. Use **Re-connect** on the
 
 ---
 
+## Optional · A demo website for friends
+
+- **What:** a second copy of the app with **made-up data on every tab**, at its own web address. Friends see how it works; your real numbers stay private.
+- **How it's different from your real app:**
+
+| | Your real app | Demo |
+|---|---|---|
+| Data | Yours | Made up (fake banks, amounts and pay) |
+| Banks | Connected through Plaid | None. Sync and connecting banks are turned off. |
+| Storage drive (volume) | Yes | Not needed: it rebuilds the sample data each time it starts |
+| Changes visitors make | — | Wiped every night at 3:00, and whenever it wakes up |
+| Label | — | "Sample data" banner on every page |
+
+**Cost:** a little extra Railway usage. With "sleeping" turned on (step 6), it pauses when nobody visits and costs almost nothing. Your usage limit covers both services together.
+
+**Set up (about 10 minutes):**
+
+1. In your Railway project, click **+ Create** (top right) → **GitHub Repo** → pick the same `personal-finance` repo.
+   - _You'll see:_ a second box appears next to the first one.
+2. Click the new box → **Settings** → rename it to `demo` (so you can tell them apart).
+3. **Variables** → **Raw Editor** → paste, then fill in:
+   ```
+   DEMO=1
+   APP_PASSWORD=
+   SESSION_SECRET=
+   TZ=America/Los_Angeles
+   ```
+   - `APP_PASSWORD`: the password you'll give friends (it's only for the demo).
+   - `SESSION_SECRET`: a new random code. In Terminal, run `openssl rand -base64 48` and paste the result. Don't reuse your real app's.
+   - **Don't add** your Plaid keys, `DATABASE_PATH` or a volume to the demo.
+4. **Settings** → **Networking** → **Generate Domain**. This is the address you share.
+5. Click **Deploy** and wait for green.
+6. **Settings** → find **Serverless** (also called App Sleeping) → turn it **on**.
+   - _What it does:_ the demo pauses after about 10 minutes with no visitors, and wakes up in a few seconds when someone opens it.
+
+**You'll know it worked:** the demo address shows the login page with a green "Sample data" banner. After logging in, every tab, including Pay, has made-up numbers.
+
+**Good to know:** pushing new code to GitHub updates both the real app and the demo.
+
+---
+
 ## Everyday use
 
 | Situation | What happens |

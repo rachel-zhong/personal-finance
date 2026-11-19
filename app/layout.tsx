@@ -9,7 +9,8 @@ import { HIDE_AMOUNTS_SCRIPT } from "@/components/privacy-toggle";
 import Link from "next/link";
 import { Landmark } from "lucide-react";
 import { headers } from "next/headers";
-import { compensationEnabled } from "@/lib/hosted";
+import { compensationEnabled, isDemo } from "@/lib/hosted";
+import DemoBanner from "@/components/demo-banner";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const grotesk = Space_Grotesk({ subsets: ["latin"], weight: ["500", "600", "700"], variable: "--font-grotesk" });
@@ -42,7 +43,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   if (path === "/login") {
     return (
       <html lang="en" className={cn("font-sans", inter.variable, grotesk.variable)} suppressHydrationWarning>
-        <body className="bg-background px-4 text-foreground">{children}</body>
+        <body className="bg-background text-foreground">{isDemo() && <DemoBanner />}<div className="px-4">{children}</div></body>
       </html>
     );
   }
@@ -55,6 +56,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <div className="flex min-h-screen bg-background text-foreground">
           <AppSidebar showPay={showPay} />
           <div className="flex min-w-0 flex-1 flex-col">
+            {isDemo() && <DemoBanner />}
             {/* Phone header: logo and Sync now (the sidebar is hidden under 768px) */}
             <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-border bg-background/95 px-4 pb-2 pt-[calc(env(safe-area-inset-top)+8px)] backdrop-blur md:hidden">
               <div className="flex items-center gap-2">

@@ -1,5 +1,6 @@
 import PrivacyToggle from "@/components/privacy-toggle";
 import RefreshButton from "@/components/investments/refresh-button";
+import { isDemo } from "@/lib/hosted";
 import Link from "next/link";
 import { getDb } from "@/lib/db";
 import { dollars, shortDate } from "@/lib/format";
@@ -66,7 +67,7 @@ export default async function InvestmentsPage() {
           <p className="text-sm text-muted-foreground">Investment and retirement accounts, including the ones you track by hand.</p>
         </div>
         <div className="flex flex-none items-center gap-2">
-          <RefreshButton />
+          {!isDemo() && <RefreshButton />}
           <PrivacyToggle />
         </div>
       </div>
