@@ -283,21 +283,33 @@ interface Cand {
   account_name: string; same_merchant: number; gross?: number; remaining?: number; amount?: number; left?: number;
 }
 
-/** Pick the other side of a match. From a purchase: refunds with money left. From a refund: purchases. */
+interface Filter { q: string; from: string; to: string; merchant: "same" | "any" }
+
+/**
+ * Pick the other side of a match. From a purchase: refunds with money left. From a refund (or payback): purchases.
+ * Filters: same or any merchant, a date range (defaults come back from the server), and a text search.
+ */
 function Picker({ t, left, payback = false }: { t: TxnRow; left: number; payback?: boolean }) {
   const router = useRouter();
   const isPurchase = t.flow === "spend";
-  const [q, setQ] = useState("");
+  const [f, setF] = useState<Filter | null>(null);
   const [cands, setCands] = useState<Cand[] | null>(null);
   const [amounts, setAmounts] = useState<Record<string, string>>({});
   const [err, setErr] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
-  async function load(search = q) {
-    setErr(null);
-    const key = isPurchase ? "purchaseId" : "refundId";
-    const r = await fetch(`/api/refunds/candidates?${key}=${encodeURIComponent(t.id)}&q=${encodeURIComponent(search)}`);
-    const j = await r.json();
-    if (!r.ok) setErr(j.error); else setCands(j.candidates);
+  async function load(next: Partial<Filter> = {}) {
+    setErr(null); setBusy(true);
+    const want = { ...(f ?? {}), ...next };
+    const qs = new URLSearchParams({ [isPurchase ? "purchaseId" : "refundId"]: t.id });
+    for (const k of ["q", "from", "to", "merchant"] as const) if (want[k]) qs.set(k, want[k] as string);
+    try {
+      const r = await fetch(`/api/refunds/candidates?${qs}`);
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.error);
+      setCands(j.candidates);
+      setF({ q: want.q ?? "", from: j.from, to: j.to, merchant: j.merchant });
+    } catch (e) { setErr((e as Error).message); } finally { setBusy(false); }
   }
   async function match(other: Cand) {
     setErr(null);
@@ -312,24 +324,49 @@ function Picker({ t, left, payback = false }: { t: TxnRow; left: number; payback
     } catch (e) { setErr((e as Error).message); }
   }
 
-  if (cands === null) {
+  const what = isPurchase ? "refunds" : "purchases";
+  if (!f) {
     return (
       <div className="flex flex-wrap items-center gap-2 pb-2">
-        <Button size="sm" variant="outline" onClick={() => load("")}>
-          {payback ? "Show purchases around this date" : `Show same-merchant ${isPurchase ? "refunds" : "purchases"}`}
+        <Button size="sm" variant="outline" disabled={busy} onClick={() => load()}>
+          {payback ? "Show purchases around this date" : `Find ${what} to match`}
         </Button>
-        <span className="text-xs text-muted-foreground">or</span>
-        <Input className="h-8 w-56 bg-card" placeholder={`search any ${isPurchase ? "refund" : "purchase"}…`} value={q}
-          onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); load(); } }} />
         {err && <span className="text-sm text-destructive">{err}</span>}
       </div>
     );
   }
+  const seg = (on: boolean, first: boolean) => cn("h-8 px-2.5 text-xs font-semibold", !first && "border-l border-input",
+    on ? "bg-primary text-primary-foreground" : "bg-card text-ink-2 hover:bg-hairline");
   return (
     <div className="pb-2">
-      {err && <p className="text-sm text-destructive">{err}</p>}
-      {!cands.length && <p className="py-2 text-xs text-muted-foreground">Nothing found. Try searching by name.</p>}
-      {cands.map((c) => {
+      {/* Filters: which merchants, which dates, optional text. Each change reloads the list. */}
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-border bg-field px-3 py-2 text-xs">
+        <div role="group" aria-label="Merchant" className="flex overflow-hidden rounded-md border border-input">
+          <button type="button" aria-pressed={f.merchant === "same"} className={seg(f.merchant === "same", true)} onClick={() => load({ merchant: "same" })}>Same merchant</button>
+          <button type="button" aria-pressed={f.merchant === "any"} className={seg(f.merchant === "any", false)} onClick={() => load({ merchant: "any" })}>Any merchant</button>
+        </div>
+        <label className="flex items-center gap-1.5 text-muted-foreground">From
+          <input type="date" value={f.from} max={f.to} onChange={(e) => e.target.value && load({ from: e.target.value })}
+            className="h-8 rounded-md border border-input bg-card px-2 text-xs text-foreground" />
+        </label>
+        <label className="flex items-center gap-1.5 text-muted-foreground">To
+          <input type="date" value={f.to} min={f.from} onChange={(e) => e.target.value && load({ to: e.target.value })}
+            className="h-8 rounded-md border border-input bg-card px-2 text-xs text-foreground" />
+        </label>
+        <Input className="h-8 w-44 bg-card text-xs" placeholder="Search name…" value={f.q}
+          onChange={(e) => setF({ ...f, q: e.target.value })}
+          onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); load({ q: f.q }); } }} />
+        <span className="text-muted-foreground">
+          {busy ? "Loading…" : `${cands?.length ?? 0} ${what}${cands?.length === 100 ? " (first 100)" : ""} · closest to ${dayShort(t.date)} first`}
+        </span>
+      </div>
+      {err && <p className="pt-2 text-sm text-destructive">{err}</p>}
+      {cands && !cands.length && !busy && (
+        <p className="py-2 text-xs text-muted-foreground">
+          Nothing in these dates{f.merchant === "same" ? " at this merchant. Try Any merchant" : ". Try wider dates"}{f.q ? " or clear the search" : ""}.
+        </p>
+      )}
+      {cands?.map((c) => {
         const room = isPurchase ? (c.left ?? 0) : (c.remaining ?? 0);
         const fits = Math.min(left, room);
         return (

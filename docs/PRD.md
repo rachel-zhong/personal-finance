@@ -179,7 +179,18 @@ net = purchase amount − refunds applied to it
 
 Plus one row per unmatched refund: `net = −(refund − amount already applied)`, in the refund's own month.
 
-Manual matching: any refund can be matched by hand to a purchase from a picker. Matches can be undone.
+**Manual matching.** Open a refund (or a purchase) and choose "Find purchases to match" ("Find refunds to match"). A picker lists the other side, with filters:
+
+| Filter | Default | Notes |
+|---|---|---|
+| Merchant | Same merchant (paybacks: any merchant) | Switch to **Any merchant** when the refund comes from a different name than the purchase (e.g. a tax refund service, a marketplace). |
+| From / To dates | Refund: 90 days before to 3 days after (paybacks: 45 days before). Purchase: 3 days before to 90 days after. | Editable; the list reloads on change. |
+| Search | Empty | Any part of the name or description. |
+
+- Sorted closest to the transaction's date first (same merchant first when both show).
+- Hides payment-app purchases in "any merchant" mode, and purchases already fully refunded.
+- Up to 100 results. Each row has an amount box (defaults to what fits) and a Match button.
+- Matches can be undone.
 
 ### 3.4 Paybacks and reimbursements
 
@@ -189,7 +200,7 @@ Money from a friend (Venmo, Zelle …) or from work (Expensify …) often pays y
 |---|---|
 | **Paybacks to review** | Money in from a payment app, reimbursement service, ATM or mobile deposit that still counts as income. It's a filter on Spending and Transactions. |
 | Row tag | "payback?" or "reimbursement" on those rows, which expand to an action. |
-| **Match to a purchase** | A picker lists purchases from 45 days before to 3 days after, any merchant, nearest date first. Choosing one gives the money in that purchase's category (so it becomes a refund) and links it with the amount entered. |
+| **Match to a purchase** | The same picker as manual matching (3.3), defaulting to any merchant, 45 days before to 3 days after. Choosing one gives the money in that purchase's category (so it becomes a refund) and links it with the amount entered. |
 | **Not income: money back** | Pick a spending category. Optional: apply to every payment from this sender. |
 | **Not income: my own money** | Category Transfer (e.g. cash you deposited). |
 | **Count as income again** | Undoes either choice. |

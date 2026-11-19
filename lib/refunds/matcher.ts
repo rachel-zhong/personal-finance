@@ -175,31 +175,32 @@ export async function manualMatch(db: Db, refundId: string, purchaseId: string, 
 }
 
 /** Purchases a refund could be applied to: same merchant first, then anything matching the search text. */
-export async function candidatePurchases(db: Db, refundId: string, search?: string) {
+export interface CandidateFilter {
+  q?: string;
+  /** Inclusive date range (YYYY-MM-DD). Defaults depend on the side; see below. */
+  from?: string; to?: string;
+  /** "same": only the same merchant. "any": every merchant in the date range. */
+  merchant?: "same" | "any";
+}
+export interface Candidates<T> { candidates: T[]; from: string; to: string; merchant: "same" | "any"; anchor: string }
+
+const iso = (d?: string) => (d && /^\d{4}-\d{2}-\d{2}$/.test(d) ? d : undefined);
+
+/**
+ * Purchases a refund (or payback) could go against.
+ * Defaults: same merchant, 90 days before to 3 days after the refund. A payback defaults to any merchant, 45 days before.
+ * With "any" merchant, closest date first; otherwise same merchant first, then closest date.
+ */
+export async function candidatePurchases(db: Db, refundId: string, f: CandidateFilter = {}) {
   const r = await db.get<{ date: string; merchant_key: string; merchant_norm: string | null }>(
-    "SELECT date, merchant_key, merchant_norm FROM transactions WHERE id = ?",
-    [refundId],
-  );
-  if (!r) return [];
-  const like = search ? `%${search.toLowerCase()}%` : null;
-  if (!like && isPaybackName(r.merchant_norm)) {
-    // A payback: purchases from 45 days before to a few days after, any merchant, closest date first.
-    return db.all<{
-      id: string; date: string; merchant: string | null; description: string | null;
-      gross: number; remaining: number; account_name: string; same_merchant: number;
-    }>(
-      `SELECT p.id, p.date, p.merchant, p.description, -p.amount AS gross,
-              -p.amount - COALESCE((SELECT SUM(amount_applied) FROM refund_matches m WHERE m.purchase_id = p.id AND m.refund_id <> ?), 0) AS remaining,
-              COALESCE(a.display_name, a.name) AS account_name, 0 AS same_merchant
-         FROM transactions p JOIN accounts a ON a.id = p.account_id
-        WHERE p.flow = 'spend' AND p.removed = 0 AND p.date BETWEEN ? AND ?
-          AND NOT (${P2P_LIKE.replace(/merchant_norm/g, "p.merchant_norm")})
-        ORDER BY ABS(julianday(p.date) - julianday(?)), p.amount
-        LIMIT 50`,
-      [refundId, shiftDate(r.date, -45), shiftDate(r.date, 3), r.date],
-    );
-  }
-  return db.all<{
+    "SELECT date, merchant_key, merchant_norm FROM transactions WHERE id = ?", [refundId]);
+  if (!r) return null;
+  const payback = isPaybackName(r.merchant_norm);
+  const merchant = f.merchant ?? (payback ? "any" : "same");
+  const from = iso(f.from) ?? shiftDate(r.date, payback ? -45 : -MATCH_WINDOW_DAYS);
+  const to = iso(f.to) ?? shiftDate(r.date, MATCH_GRACE_DAYS);
+  const like = f.q ? `%${f.q.toLowerCase()}%` : null;
+  const rows = await db.all<{
     id: string; date: string; merchant: string | null; description: string | null;
     gross: number; remaining: number; account_name: string; same_merchant: number;
   }>(
@@ -208,21 +209,31 @@ export async function candidatePurchases(db: Db, refundId: string, search?: stri
             COALESCE(a.display_name, a.name) AS account_name,
             CASE WHEN p.merchant_key = ? THEN 1 ELSE 0 END AS same_merchant
        FROM transactions p JOIN accounts a ON a.id = p.account_id
-      WHERE p.flow = 'spend' AND p.removed = 0 AND p.date <= ?   -- up to MATCH_GRACE_DAYS after the refund
-        AND (${like ? "LOWER(COALESCE(p.merchant, '') || ' ' || COALESCE(p.description, '')) LIKE ?" : "p.merchant_key = ?"})
-      ORDER BY same_merchant DESC, p.date DESC
-      LIMIT 50`,
-    [refundId, r.merchant_key, shiftDate(r.date, MATCH_GRACE_DAYS), like ?? r.merchant_key],
+      WHERE p.flow = 'spend' AND p.removed = 0 AND p.date BETWEEN ? AND ?
+        -- fully refunded purchases can't take more (the current refund's own share doesn't count against it)
+        AND -p.amount - COALESCE((SELECT SUM(amount_applied) FROM refund_matches m WHERE m.purchase_id = p.id AND m.refund_id <> ?), 0) > 0
+        ${merchant === "same" ? "AND p.merchant_key = ?" : `AND NOT (${P2P_LIKE.replace(/merchant_norm/g, "p.merchant_norm")})`}
+        ${like ? "AND LOWER(COALESCE(p.merchant, '') || ' ' || COALESCE(p.description, '')) LIKE ?" : ""}
+      ORDER BY ${merchant === "same" ? "" : "same_merchant DESC, "}ABS(julianday(p.date) - julianday(?)), p.amount
+      LIMIT 100`,
+    [refundId, r.merchant_key, from, to, refundId, ...(merchant === "same" ? [r.merchant_key] : []), ...(like ? [like] : []), r.date],
   );
+  return { candidates: rows, from, to, merchant, anchor: r.date } satisfies Candidates<(typeof rows)[number]>;
 }
 
-/** Refunds with money left to apply that could go against this purchase: same merchant first. */
-export async function candidateRefunds(db: Db, purchaseId: string, search?: string) {
+/**
+ * Refunds with money left that could go against this purchase.
+ * Defaults: same merchant, 3 days before to 90 days after the purchase. Same merchant first, then closest date.
+ */
+export async function candidateRefunds(db: Db, purchaseId: string, f: CandidateFilter = {}) {
   const p = await db.get<{ date: string; merchant_key: string }>(
     "SELECT date, merchant_key FROM transactions WHERE id = ?", [purchaseId]);
-  if (!p) return [];
-  const like = search ? `%${search.toLowerCase()}%` : null;
-  return db.all<{
+  if (!p) return null;
+  const merchant = f.merchant ?? "same";
+  const from = iso(f.from) ?? shiftDate(p.date, -MATCH_GRACE_DAYS);
+  const to = iso(f.to) ?? shiftDate(p.date, MATCH_WINDOW_DAYS);
+  const like = f.q ? `%${f.q.toLowerCase()}%` : null;
+  const rows = await db.all<{
     id: string; date: string; merchant: string | null; description: string | null;
     amount: number; left: number; account_name: string; same_merchant: number;
   }>(
@@ -231,11 +242,13 @@ export async function candidateRefunds(db: Db, purchaseId: string, search?: stri
             COALESCE(a.display_name, a.name) AS account_name,
             CASE WHEN r.merchant_key = ? THEN 1 ELSE 0 END AS same_merchant
        FROM transactions r JOIN accounts a ON a.id = r.account_id
-      WHERE r.flow = 'refund' AND r.removed = 0 AND r.pending = 0 AND r.date >= ?   -- refund may precede by MATCH_GRACE_DAYS
+      WHERE r.flow = 'refund' AND r.removed = 0 AND r.pending = 0 AND r.date BETWEEN ? AND ?
         AND r.amount - COALESCE((SELECT SUM(amount_applied) FROM refund_matches m WHERE m.refund_id = r.id), 0) > 0
-        AND (${like ? "LOWER(COALESCE(r.merchant, '') || ' ' || COALESCE(r.description, '')) LIKE ?" : "r.merchant_key = ?"})
-      ORDER BY same_merchant DESC, r.date
-      LIMIT 50`,
-    [p.merchant_key, shiftDate(p.date, -MATCH_GRACE_DAYS), like ?? p.merchant_key],
+        ${merchant === "same" ? "AND r.merchant_key = ?" : ""}
+        ${like ? "AND LOWER(COALESCE(r.merchant, '') || ' ' || COALESCE(r.description, '')) LIKE ?" : ""}
+      ORDER BY same_merchant DESC, ABS(julianday(r.date) - julianday(?))
+      LIMIT 100`,
+    [p.merchant_key, from, to, ...(merchant === "same" ? [p.merchant_key] : []), ...(like ? [like] : []), p.date],
   );
+  return { candidates: rows, from, to, merchant, anchor: p.date } satisfies Candidates<(typeof rows)[number]>;
 }
