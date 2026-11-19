@@ -5,8 +5,7 @@ import { authEnabled, compensationEnabled } from "@/lib/hosted";
 export const runtime = "nodejs";
 
 /** Parents first when adding, children first when removing (lines, deposits and vests belong to a statement). */
-const PAY_TABLES = ["comp_statements", "comp_lines", "comp_deposits", "comp_rsu_vests", "comp_w2", "comp_base_pay"] as const;
-type PayTable = (typeof PAY_TABLES)[number];
+import { PAY_TABLES, type PayTable } from "@/lib/compensation/pay-tables";
 
 const fail = (error: string, status = 400) => NextResponse.json({ error }, { status });
 

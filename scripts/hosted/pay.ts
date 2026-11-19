@@ -11,8 +11,8 @@
 import path from "node:path";
 import Database from "better-sqlite3";
 import { appOrigin, login, reportFailure } from "./common";
+import { PAY_TABLES as TABLES } from "../../lib/compensation/pay-tables";
 
-const TABLES = ["comp_statements", "comp_lines", "comp_deposits", "comp_rsu_vests", "comp_w2", "comp_base_pay"];
 
 async function main() {
   const origin = appOrigin(process.argv.slice(2).find((a) => !a.startsWith("--")), "npm run hosted:pay -- https://<your-app>.up.railway.app");

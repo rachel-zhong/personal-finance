@@ -17,12 +17,13 @@ export default function PayUpload({ compact = false }: { compact?: boolean }) {
   const [over, setOver] = useState(false);
   const [busy, setBusy] = useState(0);
   const [results, setResults] = useState<Result[]>([]);
+  const [website, setWebsite] = useState<{ ok: boolean; message: string } | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
   async function send(files: FileList | File[]) {
     const list = [...files];
     if (!list.length) return;
-    setBusy(list.length); setErr(null); setResults([]);
+    setBusy(list.length); setErr(null); setResults([]); setWebsite(null);
     try {
       const body = new FormData();
       for (const f of list) body.append("files", f);
@@ -30,6 +31,7 @@ export default function PayUpload({ compact = false }: { compact?: boolean }) {
       const json = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(json.error || res.statusText);
       setResults(json.results);
+      setWebsite(json.website ?? null);
       router.refresh();
     } catch (e) { setErr((e as Error).message); } finally { setBusy(0); if (input.current) input.current.value = ""; }
   }
@@ -66,6 +68,13 @@ export default function PayUpload({ compact = false }: { compact?: boolean }) {
               <span className="min-w-0"><span className="font-medium">{r.file}</span> <span className="text-muted-foreground">· {r.message}</span></span>
             </div>
           ))}
+          {website && (
+            <div className="flex items-start gap-2">
+              {website.ok ? <CheckCircle2 className="mt-0.5 size-4 flex-none text-income-ink" aria-hidden="true" />
+                : <XCircle className="mt-0.5 size-4 flex-none text-warn" aria-hidden="true" />}
+              <span className={website.ok ? "text-income-ink" : "text-warn"}>{website.message}</span>
+            </div>
+          )}
           {imported > 0 && !compact && (
             <Link href="/compensation" className="mt-1 w-fit text-sm font-semibold">See it in Compensation →</Link>
           )}

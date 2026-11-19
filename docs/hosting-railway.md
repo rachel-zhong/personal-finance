@@ -187,31 +187,33 @@ Never add a bank you already have as a new connection. Use **Re-connect** on the
 ## Optional · Compensation on your phone
 
 - **What:** shows the Compensation tab on the website, while your pay **PDFs stay on your Mac**.
-- **How it works:** your Mac reads the PDFs (as it does today). One command then sends only the resulting **numbers** (salary, taxes, RSUs, take-home) to the website. The website never receives or needs the PDFs.
+- **How it works:** your Mac reads the PDFs (as it does today). It then sends only the resulting **numbers** (salary, taxes, RSUs, take-home) to the website. The website never receives or needs the PDFs.
 - **The trade-off:** the numbers are stored on Railway, behind your login. The documents are not.
+- **Link code:** a long random password that only your Mac app and your website know. It lets the Mac send pay numbers without you typing your login each time. It works for pay numbers only, nothing else.
 
-**Turn it on (once):**
+**One-time setup (about 3 minutes):**
 
-1. Railway → `personal-finance` → **Variables** → set `HOSTED_INCLUDE_COMPENSATION` to `true` → deploy.
-2. **You'll know it worked:** the website's menu shows **Compensation** ("Pay" on your phone). It's empty until step 3.
-3. On your Mac, in Terminal:
-   ```bash
-   cd ~/Documents/finance-app
-   ```
-   ```bash
-   npm run hosted:pay -- https://YOUR-APP-ADDRESS
-   ```
-4. Type your app password, press Enter for the code (if you skipped Step 5).
-5. **You'll know it worked:** Terminal says **✓ Pay numbers updated online**, and the Compensation tab matches your Mac.
+1. On your **Mac**, open the app → **Connections & files** → **Compensation on your website**.
+2. Paste your app address (e.g. `https://your-app.up.railway.app`) → **Link**.
+3. The app shows a **link code** and the next steps. Click **Copy**.
+4. In **Railway** → `personal-finance` → **Variables**:
+   - **+ New Variable** → name `PAY_SYNC_TOKEN`, value: paste the link code.
+   - Set `HOSTED_INCLUDE_COMPENSATION` to `true`.
+   - Click **Deploy** and wait for green.
+5. Back in the Mac app, click **Send pay numbers now**.
+6. **You'll know it worked:** the app says **✓ Website updated**, and the website's menu shows **Compensation** ("Pay" on your phone) with the same numbers as your Mac.
 
-**Each time you get new pay documents:**
+**After that: nothing to do.** Each time you add pay PDFs in the Mac app, the website updates automatically. You'll see "Website updated" under the upload. A **Send to website now** button sits at the bottom of the Compensation tab if you ever want it.
 
-1. On your Mac: drop the PDFs in the app (Connections & files, or the bottom of Compensation).
-2. Run the same `npm run hosted:pay -- https://YOUR-APP-ADDRESS` command.
+**Good to know**
 
-**What it touches online:** only pay numbers. Bank data, transactions and anything you changed online stay as they are.
-
-**Turn it off later:** set `HOSTED_INCLUDE_COMPENSATION` back to `false`. The tab disappears and new pay numbers are refused. (The numbers already sent stay on the drive. Ask Claude if you want them deleted.)
+| Situation | What happens |
+|---|---|
+| Mac app not running | Nothing is sent. The next time you add PDFs (or click Send), everything goes at once. |
+| What it changes online | Only pay numbers. Bank data and anything you changed online stay as they are. |
+| Lost or shared the code | In the Mac app click **Unlink**, link again for a new code, and replace `PAY_SYNC_TOKEN` in Railway. |
+| Turn it off | Set `HOSTED_INCLUDE_COMPENSATION` to `false` in Railway. The tab disappears and new numbers are refused. Numbers already sent stay on the drive; ask Claude if you want them deleted. |
+| Without the app (Terminal) | `npm run hosted:pay -- https://YOUR-APP-ADDRESS` does the same with your login instead of the code. |
 
 ---
 

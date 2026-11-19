@@ -1,5 +1,7 @@
 import PrivacyToggle from "@/components/privacy-toggle";
 import PayUpload from "@/components/files/pay-upload";
+import WebsiteLink from "@/components/files/website-link";
+import { getLink } from "@/lib/website-link";
 import { notFound } from "next/navigation";
 import { compensationEnabled, payUploadsEnabled } from "@/lib/hosted";
 import Link from "next/link";
@@ -279,6 +281,10 @@ export default async function CompensationPage({ searchParams }: { searchParams:
         <section aria-label="Add pay documents" className="flex flex-col gap-2 rounded-xl border border-border bg-card p-5">
           <h2 className="text-base font-semibold">Add pay documents</h2>
           <PayUpload compact />
+          <div className="mt-2 border-t border-hairline pt-3">
+            <h3 className="pb-2 text-sm font-semibold">Your website</h3>
+            <WebsiteLink link={getLink()} compact />
+          </div>
         </section>
       )}
     </>

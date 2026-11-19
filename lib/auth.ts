@@ -142,3 +142,17 @@ export async function attemptLogin(db: Db, password: string, code: string, now =
   // Same message for a wrong password or a wrong code, so a guesser can't tell which part was right.
   return { ok: false, error: `That didn't work. ${left} ${left === 1 ? "try" : "tries"} left before a ${LOCK_MINUTES}-minute lock.` };
 }
+
+// ---------- Link code (Mac app → website, pay numbers only) ----------
+
+/**
+ * The website accepts pay numbers from your Mac's app when the request carries the link code (PAY_SYNC_TOKEN)
+ * as "Authorization: Bearer <code>". Only for /api/admin/pay. Browsers never send this header on their own,
+ * so other websites can't use it.
+ */
+export function payLinkValid(authorization: string | null): boolean {
+  const want = process.env.PAY_SYNC_TOKEN;
+  if (!want || want.length < 32 || !authorization?.startsWith("Bearer ")) return false;
+  const got = createHash("sha256").update(authorization.slice(7).trim()).digest();
+  return timingSafeEqual(got, createHash("sha256").update(want).digest());
+}

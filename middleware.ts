@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SESSION_COOKIE, sessionValid } from "@/lib/auth";
+import { SESSION_COOKIE, payLinkValid, sessionValid } from "@/lib/auth";
 
 /**
  * Runs before every page and API route.
@@ -7,6 +7,8 @@ import { SESSION_COOKIE, sessionValid } from "@/lib/auth";
  * 1. Login (hosted): when APP_PASSWORD is set, everything needs a valid session cookie except the login page,
  *    the login API, the health check and the home-screen icons. Pages redirect to /login; APIs answer 401.
  *    On your Mac without APP_PASSWORD there is no login.
+ *
+ *    Exception: /api/admin/pay also accepts the Mac app's link code (PAY_SYNC_TOKEN), see lib/auth.ts.
  *
  * 2. Same-site check (CSRF): API calls that change data must come from this app's own pages, so another website
  *    open in your browser can't POST to it. Allowed origins:
@@ -34,6 +36,11 @@ function sameSite(req: NextRequest) {
 export function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
   const isApi = path.startsWith("/api/");
+
+  // Your Mac's app sending pay numbers with the link code (no browser, no cookie). Only this one route.
+  if (path === "/api/admin/pay" && req.method === "POST" && payLinkValid(req.headers.get("authorization"))) {
+    return NextResponse.next();
+  }
 
   if (process.env.APP_PASSWORD && !PUBLIC.some((re) => re.test(path))) {
     if (!sessionValid(req.cookies.get(SESSION_COOKIE)?.value)) {

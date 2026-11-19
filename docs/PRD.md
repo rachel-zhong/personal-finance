@@ -672,7 +672,8 @@ The same code runs on a server (Railway) for phone access from anywhere. Setup s
 | HS-9 | **Daily sync** | Inside the app (no extra service): checks every 30 minutes and syncs once a day after `SYNC_HOUR` (default 6) in `TZ`, if nothing synced since. Sync now still works. |
 | HS-10 | **Bank sign-in return** | `/oauth` reopens Plaid Link with the saved token (`PLAID_REDIRECT_URI`) to finish OAuth banks on a phone. Update mode only. |
 | HS-11 | **Phone** | Manifest, icons and the bottom tab bar unchanged. Without Compensation the tab bar has 4 tabs. |
-| HS-12 | **Pay numbers without PDFs** | `npm run hosted:pay` reads the Mac's already-imported pay rows and sends only those (never the PDFs). The server replaces its pay rows in one step and touches nothing else. Refused unless `HOSTED_INCLUDE_COMPENSATION=true`. |
+| HS-12 | **Pay numbers without PDFs** | The Mac reads the PDFs; only the resulting pay rows go to the website, which replaces its pay rows in one step and touches nothing else. Refused unless `HOSTED_INCLUDE_COMPENSATION=true`. |
+| HS-13 | **Link code (one-time setup)** | Mac app → Connections & files → link the website address; the app makes a random link code (saved in `data/website-link.json`, owner-only) and shows the Railway steps (`PAY_SYNC_TOKEN`). Then pay numbers go automatically after every PDF upload, plus a "Send now" button. The website accepts the code (Bearer, constant-time check) on `/api/admin/pay` only. `npm run hosted:pay` remains as a Terminal alternative using the login. |
 
 - _Open:_ email one-time codes need an outside email service, so they aren't built. The authenticator code covers the second step.
 

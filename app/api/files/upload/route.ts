@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { resequence } from "@/lib/compensation/store";
 import { payUploadsEnabled } from "@/lib/hosted";
+import { getLink, sendPay } from "@/lib/website-link";
 import { COMP_ROOT, PAYSTUB_DIR, importBasePayImage, importPdf, type ImportResult } from "@/lib/compensation/importer";
 
 export const runtime = "nodejs";
@@ -69,6 +70,11 @@ export async function POST(req: Request) {
       results.push({ file: name, ok: false, message: `${(e as Error).message}. Not saved.` });
     }
   }
-  if (results.some((r) => r.ok)) await resequence(db);
-  return NextResponse.json({ results });
+  // New pay numbers: update the linked website too (numbers only; the PDFs stay here)
+  let website: { ok: boolean; message: string } | null = null;
+  if (results.some((r) => r.ok)) {
+    await resequence(db);
+    if (getLink()) website = await sendPay(db);
+  }
+  return NextResponse.json({ results, website });
 }

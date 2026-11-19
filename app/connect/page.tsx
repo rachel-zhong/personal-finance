@@ -7,7 +7,9 @@ import { investmentConnections } from "@/lib/investments";
 import PayUpload from "@/components/files/pay-upload";
 import LogoutButton from "@/components/logout-button";
 import Copyright from "@/components/copyright";
-import { authEnabled, payUploadsEnabled } from "@/lib/hosted";
+import WebsiteLink from "@/components/files/website-link";
+import { getLink } from "@/lib/website-link";
+import { authEnabled, isHosted, payUploadsEnabled } from "@/lib/hosted";
 
 export const dynamic = "force-dynamic";
 
@@ -49,6 +51,19 @@ export default async function ConnectPage() {
         </div>
         <PayUpload />
       </section>}
+
+      {!isHosted() && (
+        <section id="website" aria-label="Compensation on the website" className="flex scroll-mt-4 flex-col gap-3 rounded-xl border border-border bg-card p-5">
+          <div>
+            <h2 className="text-base font-semibold">Compensation on your website</h2>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              Shows the Compensation tab on your phone. Only the pay numbers are sent; the PDFs stay on this Mac.
+              After the one-time setup, new pay documents update the website automatically.
+            </p>
+          </div>
+          <WebsiteLink link={getLink()} />
+        </section>
+      )}
 
       <section className="flex flex-col rounded-xl border border-border bg-card px-5 py-4">
         <h2 className="pb-2 text-base font-semibold">Connected</h2>
