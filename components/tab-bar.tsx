@@ -1,14 +1,15 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Landmark, LayoutDashboard, PieChart, ReceiptText } from "lucide-react";
+import { BadgeDollarSign, LayoutDashboard, PieChart, ReceiptText, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const TABS = [
-  { href: "/", label: "Overview", Icon: LayoutDashboard },
+  { href: "/", label: "Net worth", Icon: LayoutDashboard },
   { href: "/spending", label: "Spending", Icon: PieChart },
   { href: "/transactions", label: "Transactions", Icon: ReceiptText },
-  { href: "/connect", label: "Connections", Icon: Landmark },
+  { href: "/investments", label: "Investments", Icon: TrendingUp },
+  { href: "/compensation", label: "Pay", Icon: BadgeDollarSign },
 ];
 
 /** Phone navigation: fixed to the bottom, clear of the iPhone home indicator. Hidden from 768px up (the sidebar takes over). */
@@ -17,7 +18,7 @@ export default function TabBar() {
   const active = (href: string) => (href === "/" ? path === "/" || path.startsWith("/accounts") : path.startsWith(href));
   return (
     <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
-      <div className="mx-auto grid max-w-lg grid-cols-4">
+      <div className="mx-auto grid max-w-lg grid-cols-5">
         {TABS.map(({ href, label, Icon }) => {
           const on = active(href);
           return (

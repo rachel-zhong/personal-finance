@@ -14,7 +14,7 @@ const axis = (iso: string) =>
   new Date(iso + "T00:00:00").toLocaleDateString("en-US", { month: "short" }) + " \u2019" + iso.slice(2, 4);
 
 /** Quarter-end net worth: one marker per quarter with its value above and its date below. */
-export default function NetWorthTrend({ points }: { points: TrendPoint[] }) {
+export default function NetWorthTrend({ points, what = "Net worth" }: { points: TrendPoint[]; what?: string }) {
   const vals = points.map((p) => p.value);
   const lo = Math.min(...vals), hi = Math.max(...vals);
   const span = hi - lo || Math.abs(hi) || 1;
@@ -29,7 +29,7 @@ export default function NetWorthTrend({ points }: { points: TrendPoint[] }) {
     <>
       <div className="relative h-[170px]">
         <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" role="img"
-          aria-label={`Net worth at each quarter end: ${points.map((p) => `${label(p.date)} ${dollars(p.value)}`).join(", ")}`}
+          aria-label={`${what} at each quarter end: ${points.map((p) => `${label(p.date)} ${dollars(p.value)}`).join(", ")}`}
           className="absolute inset-0 block h-[170px] w-full">
           <line x1="0" y1={base} x2={W} y2={base} stroke="var(--border)" strokeWidth="1" />
           <path d={area} fill="var(--brand-soft)" />
@@ -40,7 +40,7 @@ export default function NetWorthTrend({ points }: { points: TrendPoint[] }) {
             <span aria-hidden="true" className="absolute size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-[2.5px] border-brand bg-card"
               style={{ left: `${(xy[i][0] / W) * 100}%`, top: `${(xy[i][1] / H) * 100}%` }} />
             <span className={cn("absolute -translate-x-1/2 -translate-y-[30px] whitespace-nowrap text-xs font-semibold", quiet(i))}
-              style={{ left: `${(xy[i][0] / W) * 100}%`, top: `${(xy[i][1] / H) * 100}%` }}>{compact(p.value)}</span>
+              style={{ left: `${(xy[i][0] / W) * 100}%`, top: `${(xy[i][1] / H) * 100}%` }}><span className="sensitive">{compact(p.value)}</span></span>
           </div>
         ))}
       </div>

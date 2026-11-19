@@ -1,3 +1,4 @@
+import PrivacyToggle from "@/components/privacy-toggle";
 import { getDb } from "@/lib/db";
 import { accountLabel, heldFor, listAccounts, myShare, recentTransactions, LIABILITY_TYPES } from "@/lib/queries";
 import { lastMonthEnd, netWorthQuarters } from "@/lib/networth";
@@ -89,17 +90,18 @@ export default async function OverviewPage() {
 
   return (
     <>
-      <div className="flex flex-wrap items-baseline justify-between gap-3">
-        <h1 className="text-[32px] font-semibold">Overview</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-[32px] font-semibold">Net worth</h1>
+        <PrivacyToggle />
       </div>
 
       <section aria-label="Net worth" className="flex flex-wrap items-stretch gap-7 rounded-2xl border border-border bg-card p-5 md:p-7">
         <div className="flex min-w-0 flex-[1_1_260px] flex-col gap-2.5">
-          <span className="text-sm font-semibold text-ink-2">Net worth</span>
-          <span className="font-heading text-[52px] font-semibold leading-none">{dollars(netWorth)}</span>
+          <span className="text-sm font-semibold text-ink-2">Today</span>
+          <span className="sensitive font-heading text-[52px] font-semibold leading-none">{dollars(netWorth)}</span>
           {diff != null && prev && (
             <div className="flex flex-wrap items-center gap-2">
-              <span className={diff >= 0 ? "rounded-full bg-accent px-2.5 py-1 text-[13px] font-semibold text-accent-foreground" : "rounded-full bg-warn-soft px-2.5 py-1 text-[13px] font-semibold text-warn"}>
+              <span className={"sensitive " + (diff >= 0 ? "rounded-full bg-accent px-2.5 py-1 text-[13px] font-semibold text-accent-foreground" : "rounded-full bg-warn-soft px-2.5 py-1 text-[13px] font-semibold text-warn")}>
                 {diff >= 0 ? "+" : "−"}{dollars(Math.abs(diff))} ({diff >= 0 ? "+" : "−"}{Math.abs(pct!).toFixed(1)}%)
               </span>
               <span className="text-[13px] text-muted-foreground">
@@ -107,7 +109,7 @@ export default async function OverviewPage() {
               </span>
             </div>
           )}
-          <p className="mt-1 text-[13px] text-ink-2">
+          <p className="sensitive mt-1 text-[13px] text-ink-2">
             {dollars(totalOf("cash"))} cash + {dollars(totalOf("invest"))} investments + {dollars(totalOf("retire"))} retirement
             {totalOf("cards") !== 0 && <> − {dollars(-totalOf("cards"))} card balances</>}
             {totalOf("parents") !== 0 && <> + {dollars(totalOf("parents"))} family accounts counted</>}

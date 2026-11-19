@@ -2,7 +2,7 @@
 import { Db, nowIso } from "./db";
 import { isCategory } from "./categories";
 import { refreshDerived } from "./store";
-import { runAutoMatch } from "./refunds/matcher";
+import { manualMatch, runAutoMatch } from "./refunds/matcher";
 import { rebuildNetWorthSnapshots } from "./networth";
 
 export type Scope = "one" | "merchant";
@@ -60,4 +60,17 @@ export async function setCategory(db: Db, txnId: string, category: string | null
 
 export async function dismissReview(db: Db, key: string) {
   await db.run("INSERT INTO review_dismissals (item_key, created_at) VALUES (?, ?) ON CONFLICT (item_key) DO NOTHING", [key, nowIso()]);
+}
+
+/**
+ * Money in that was counted as income (a Venmo payback, a work reimbursement) matched to the purchase it pays back:
+ * it takes that purchase's category, so it stops being income and lowers that spending, then the two are linked.
+ */
+export async function matchPayback(db: Db, txnId: string, purchaseId: string, amountCents?: number) {
+  const t = await db.get<{ amount: number; flow: string }>("SELECT amount, flow FROM transactions WHERE id = ? AND removed = 0", [txnId]);
+  const p = await db.get<{ app_category: string | null; flow: string }>("SELECT app_category, flow FROM transactions WHERE id = ? AND removed = 0", [purchaseId]);
+  if (!t || t.amount <= 0) throw new Error("Pick money that came in.");
+  if (!p || p.flow !== "spend" || !p.app_category) throw new Error("That transaction is not a purchase.");
+  if (t.flow !== "refund") await setCategory(db, txnId, p.app_category, "one");
+  return manualMatch(db, txnId, purchaseId, amountCents);
 }

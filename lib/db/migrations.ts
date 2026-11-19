@@ -348,4 +348,177 @@ CREATE TABLE txn_exclusions (
 );
 `,
   },
+  {
+    id: 9,
+    name: "investments: securities, holdings, daily snapshots, investment transactions (IN)",
+    sql: `
+-- Opt-in per connection: investments are only fetched after you allow them in Plaid Link (IN-2).
+ALTER TABLE connections ADD COLUMN investments_enabled INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE connections ADD COLUMN investments_error TEXT;
+
+CREATE TABLE securities (
+  id              TEXT PRIMARY KEY,           -- Plaid security_id
+  ticker          TEXT,
+  name            TEXT,
+  type            TEXT,                       -- Plaid type: equity, etf, mutual fund, fixed income, cash, cryptocurrency, ...
+  is_cash_equivalent INTEGER NOT NULL DEFAULT 0,
+  close_price     REAL,
+  close_price_as_of TEXT,
+  updated_at      TEXT NOT NULL
+);
+
+-- What each account holds right now. Values in cents; cost_basis NULL when the broker doesn't say.
+CREATE TABLE holdings (
+  account_id   TEXT NOT NULL REFERENCES accounts(id),
+  security_id  TEXT NOT NULL REFERENCES securities(id),
+  quantity     REAL NOT NULL,
+  price        REAL,
+  price_as_of  TEXT,
+  value        BIGINT NOT NULL,
+  cost_basis   BIGINT,
+  updated_at   TEXT NOT NULL,
+  PRIMARY KEY (account_id, security_id)
+);
+
+-- One row per holding per day (IN-6). Manual accounts use holding_key 'account:<id>'. Real values only.
+CREATE TABLE holding_snapshots (
+  as_of        TEXT NOT NULL,
+  account_id   TEXT NOT NULL REFERENCES accounts(id),
+  holding_key  TEXT NOT NULL,                -- security id, or 'account:<id>' for a whole manual/unloaded account
+  quantity     REAL,
+  price        REAL,
+  value        BIGINT NOT NULL,
+  cost_basis   BIGINT,
+  PRIMARY KEY (as_of, account_id, holding_key)
+);
+
+-- Buys, sells, dividends, contributions (IN-4). amount in cents, OUR sign: positive = cash into the account.
+CREATE TABLE investment_transactions (
+  id           TEXT PRIMARY KEY,             -- Plaid investment_transaction_id
+  account_id   TEXT NOT NULL REFERENCES accounts(id),
+  security_id  TEXT,
+  date         TEXT NOT NULL,
+  name         TEXT NOT NULL,
+  type         TEXT NOT NULL,
+  subtype      TEXT,
+  quantity     REAL,
+  price        REAL,
+  amount       BIGINT NOT NULL,
+  fees         BIGINT,
+  raw          TEXT
+);
+CREATE INDEX idx_inv_txn_date ON investment_transactions(date);
+
+-- Your own asset and account type for an account (IN-5); NULL = use the default.
+CREATE TABLE investment_settings (
+  account_id  TEXT PRIMARY KEY REFERENCES accounts(id),
+  asset_type  TEXT,
+  tax_type    TEXT
+);
+`,
+  },
+  {
+    id: 10,
+    name: "manual holdings inside manual accounts (IN-7)",
+    sql: `
+CREATE TABLE manual_holdings (
+  id          TEXT PRIMARY KEY,
+  account_id  TEXT NOT NULL REFERENCES accounts(id),
+  name        TEXT NOT NULL,
+  ticker      TEXT,
+  quantity    REAL,
+  value       BIGINT NOT NULL,          -- cents
+  asset_type  TEXT NOT NULL,
+  created_at  TEXT NOT NULL,
+  updated_at  TEXT NOT NULL
+);
+`,
+  },
+  {
+    id: 11,
+    name: "compensation: pay statements, line items, W-2s, base pay, RSU vests (CP)",
+    sql: `
+-- Parsed from local files in data/compensation/. Amounts in cents. Nothing here leaves this computer.
+CREATE TABLE comp_statements (
+  id              TEXT PRIMARY KEY,          -- payroll advice number (unique per statement), else a file hash
+  file            TEXT NOT NULL,
+  layout          TEXT NOT NULL,
+  pay_date        TEXT NOT NULL,
+  period_start    TEXT NOT NULL,
+  period_end      TEXT NOT NULL,
+  seq             INTEGER,                   -- order within the year, from the YTD chain
+  gross           BIGINT NOT NULL,
+  gross_ytd       BIGINT,
+  net             BIGINT NOT NULL,
+  federal_taxable BIGINT,
+  pages           INTEGER NOT NULL,
+  imported_at     TEXT NOT NULL
+);
+CREATE INDEX idx_comp_statements_date ON comp_statements(pay_date);
+
+CREATE TABLE comp_lines (
+  statement_id TEXT NOT NULL REFERENCES comp_statements(id) ON DELETE CASCADE,
+  line_no      INTEGER NOT NULL,
+  section      TEXT NOT NULL,                -- earnings | taxes | deductions | employer
+  category     TEXT NOT NULL,
+  label        TEXT NOT NULL,
+  classified   INTEGER NOT NULL,             -- 0 = only a catch-all rule matched; listed for review
+  rate         REAL,
+  hours        REAL,
+  current      BIGINT,                       -- this period; taxes/deductions as positive "taken", additions negative
+  ytd          BIGINT,
+  pretax       INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (statement_id, line_no)
+);
+
+CREATE TABLE comp_deposits (
+  statement_id TEXT NOT NULL REFERENCES comp_statements(id) ON DELETE CASCADE,
+  line_no      INTEGER NOT NULL,
+  account      TEXT,                         -- last 4 of the account, when shown
+  amount       BIGINT NOT NULL,
+  PRIMARY KEY (statement_id, line_no)
+);
+
+CREATE TABLE comp_w2 (
+  year    INTEGER PRIMARY KEY,
+  file    TEXT NOT NULL,
+  box1    BIGINT NOT NULL, box2 BIGINT NOT NULL, box3 BIGINT NOT NULL,
+  box4    BIGINT NOT NULL, box5 BIGINT NOT NULL, box6 BIGINT NOT NULL,
+  box12   TEXT NOT NULL,                     -- JSON {"D": cents, ...}
+  box14   TEXT NOT NULL,                     -- JSON [{label, cents}]
+  summary TEXT NOT NULL,
+  imported_at TEXT NOT NULL
+);
+
+-- Base pay history: imported from the HR screenshot, editable in the app.
+CREATE TABLE comp_base_pay (
+  id             TEXT PRIMARY KEY,
+  effective_date TEXT NOT NULL,
+  reason         TEXT,
+  period_rate    BIGINT NOT NULL,            -- per pay period
+  frequency      TEXT,
+  annual         BIGINT,
+  source         TEXT NOT NULL,              -- screenshot | manual
+  edited         INTEGER NOT NULL DEFAULT 0,
+  created_at     TEXT NOT NULL,
+  updated_at     TEXT NOT NULL,
+  UNIQUE (effective_date, reason, period_rate)
+);
+
+-- One row per RSU vest statement. Fields the statement doesn't show stay NULL.
+CREATE TABLE comp_rsu_vests (
+  statement_id    TEXT PRIMARY KEY REFERENCES comp_statements(id) ON DELETE CASCADE,
+  vest_date       TEXT NOT NULL,
+  usd_value       BIGINT NOT NULL,
+  taxes_withheld  BIGINT NOT NULL,
+  net_value       BIGINT,                    -- value of shares you kept (the offset line)
+  shares          REAL,
+  shares_withheld REAL,
+  jpy_price       REAL,
+  fx_rate         REAL,
+  fees            BIGINT,
+  note            TEXT
+);
+`,
+  },
 ];

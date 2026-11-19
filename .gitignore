@@ -22,3 +22,4 @@ secrets/
 # Exported design canvases (sample data names real institutions); the design/*.dc.html files cover the same designs
 Finance App Mockups.html
 .next-phone/
+.next-check/

@@ -153,3 +153,22 @@
   /* No zoom-on-focus in iOS Safari: inputs need at least 16px text on phones. */
   input, select, textarea { font-size: 16px !important; }
 }
+
+/* Eye button (components/privacy-toggle.tsx): headline numbers marked .sensitive become dots. */
+html[data-hide-amounts] .sensitive {
+  position: relative;
+  display: inline-block;
+  min-width: 3.4em; /* room for the dots, so nearby text like "of salary" moves aside instead of overlapping */
+  visibility: hidden;
+}
+html[data-hide-amounts] .sensitive::after {
+  content: "•••••";
+  visibility: visible;
+  position: absolute;
+  left: 0;
+  top: 0;
+  white-space: nowrap;
+  letter-spacing: 0.05em;
+  color: var(--muted-foreground);
+}
+html[data-hide-amounts] .sensitive.text-right::after { left: auto; right: 0; }

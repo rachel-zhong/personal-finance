@@ -29,12 +29,12 @@ export default async function TransactionsPage({ searchParams }: { searchParams:
   const view = sp.view === "raw" ? "raw" : "net";
   const { from, to } = dateRange(range, sp.from, sp.to);
   const num = (v?: string) => (v ? Number(v.replace(/[$,\s]/g, "")) : undefined);
-  const type: TypeKey = (["in", "out", "refunds", "unmatched"] as const).find((t) => t === sp.type) ?? "";
+  const type: TypeKey = (["in", "out", "refunds", "unmatched", "review"] as const).find((t) => t === sp.type) ?? "";
   const narrow = { account: sp.account || undefined, from, to, min: num(sp.min), max: num(sp.max), q: sp.q || undefined };
   const filters = {
     ...narrow,
     dir: type === "in" || type === "out" ? type : undefined,
-    type: type === "refunds" || type === "unmatched" ? type : undefined,
+    type: type === "refunds" || type === "unmatched" || type === "review" ? type : undefined,
   };
   const counts = await txnTypeCounts(db, narrow);
   const { rows, truncated } = await listTransactions(db, filters);

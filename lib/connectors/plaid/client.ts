@@ -5,7 +5,7 @@
  * read-only endpoints in ALLOWED_ENDPOINTS. Nothing here can move money
  * (no /transfer, /payment_initiation, /bank_transfer, /processor, /signal, etc.).
  *
- * We call the REST API with fetch instead of the `plaid` npm SDK: it's four endpoints,
+ * We call the REST API with fetch instead of the `plaid` npm SDK: it's a handful of endpoints,
  * it keeps the allowlist explicit, and it avoids SDK churn.
  */
 
@@ -14,6 +14,11 @@ const ALLOWED_ENDPOINTS = new Set([
   "/item/public_token/exchange",
   "/accounts/get", // cached balances; free. We deliberately do NOT call /accounts/balance/get (billed per call).
   "/transactions/sync",
+  "/investments/holdings/get", // read-only: what you own (IN-3)
+  "/investments/transactions/get", // read-only: buys, sells, dividends (IN-4)
+  // read-only: asks Plaid to fetch fresh holdings from the broker now. Free on the Trial plan; billed per call on paid plans,
+  // so only the manual "Refresh now" button calls it, never the regular sync.
+  "/investments/refresh",
 ]);
 
 const BASE_URLS: Record<string, string> = {
@@ -63,15 +68,53 @@ export interface SyncResponse {
   has_more: boolean;
 }
 
+export interface PlaidSecurity {
+  security_id: string;
+  name: string | null;
+  ticker_symbol: string | null;
+  type: string | null; // equity | etf | mutual fund | fixed income | cash | cryptocurrency | derivative | loan | other
+  is_cash_equivalent?: boolean | null;
+  close_price: number | null;
+  close_price_as_of: string | null;
+}
+export interface PlaidHolding {
+  account_id: string;
+  security_id: string;
+  quantity: number;
+  institution_price: number;
+  institution_price_as_of?: string | null;
+  institution_value: number;
+  cost_basis: number | null;
+}
+export interface PlaidInvestmentTransaction {
+  investment_transaction_id: string;
+  account_id: string;
+  security_id: string | null;
+  date: string;
+  name: string;
+  quantity: number;
+  amount: number; // Plaid: positive = cash out of the account (a buy), negative = cash in (sale, dividend)
+  price: number;
+  fees: number | null;
+  type: string; // buy | sell | cash | fee | transfer | cancel
+  subtype: string;
+}
+
 /** What the rest of the app needs from Plaid. Tests pass a fake implementing this. */
 export interface PlaidApi {
-  linkTokenCreate(opts: { accessToken?: string; addAccounts?: boolean }): Promise<{ link_token: string }>;
+  linkTokenCreate(opts: { accessToken?: string; addAccounts?: boolean; investments?: boolean }): Promise<{ link_token: string }>;
   exchangePublicToken(publicToken: string): Promise<{ access_token: string; item_id: string }>;
   accountsGet(accessToken: string): Promise<{
     accounts: PlaidAccount[];
     item: { item_id: string; institution_id?: string | null; institution_name?: string | null };
   }>;
   transactionsSync(accessToken: string, cursor: string | null): Promise<SyncResponse>;
+  investmentsHoldingsGet(accessToken: string): Promise<{ holdings: PlaidHolding[]; securities: PlaidSecurity[] }>;
+  investmentsTransactionsGet(accessToken: string, startDate: string, endDate: string, offset: number): Promise<{
+    investment_transactions: PlaidInvestmentTransaction[]; securities: PlaidSecurity[]; total_investment_transactions: number;
+  }>;
+  /** Ask Plaid to pull fresh investment data from the broker. Returns at once; the new data lands a little later. */
+  investmentsRefresh?(accessToken: string): Promise<{ request_id: string }>;
 }
 
 export function plaidEnv() {
@@ -108,7 +151,7 @@ export function createPlaidClient(): PlaidApi {
   }
 
   return {
-    linkTokenCreate: ({ accessToken, addAccounts }) => {
+    linkTokenCreate: ({ accessToken, addAccounts, investments }) => {
       const body: Record<string, unknown> = {
         client_name: "Personal Finance (local)",
         user: { client_user_id: "local-user" },
@@ -119,6 +162,8 @@ export function createPlaidClient(): PlaidApi {
       if (accessToken) {
         body.access_token = accessToken; // update mode: re-authenticate an existing connection
         if (addAccounts) body.update = { account_selection_enabled: true }; // let you pick new accounts (e.g. a new CD)
+        // Ask for consent to read holdings on this SAME connection; never creates a new one (IN-2).
+        if (investments) body.additional_consented_products = ["investments"];
       } else {
         body.products = ["transactions"];
         body.transactions = { days_requested: 730 };
@@ -134,6 +179,12 @@ export function createPlaidClient(): PlaidApi {
         ...(cursor ? { cursor } : {}),
         count: 500,
         options: { include_personal_finance_category: true },
+      }),
+    investmentsHoldingsGet: (accessToken) => call("/investments/holdings/get", { access_token: accessToken }),
+    investmentsRefresh: (accessToken) => call("/investments/refresh", { access_token: accessToken }),
+    investmentsTransactionsGet: (accessToken, startDate, endDate, offset) =>
+      call("/investments/transactions/get", {
+        access_token: accessToken, start_date: startDate, end_date: endDate, options: { count: 500, offset },
       }),
   };
 }

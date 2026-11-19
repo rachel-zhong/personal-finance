@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { dayShort, displayAmount, money } from "@/lib/format";
-import { CATEGORIES, categoryLabel, isPayback } from "@/lib/categories";
+import { CATEGORIES, categoryLabel, isPayback, isReimbursement, isReviewable } from "@/lib/categories";
 import type { MatchRow, TxnRow } from "@/lib/queries";
 import { post } from "./api";
 import { Pencil } from "lucide-react";
@@ -96,7 +96,9 @@ export default function TxnTable({ rows, matches, view, balances = {}, owedAccou
           const isRefund = t.flow === "refund";
           const returned = net && isPurchase && t.refunded > 0;
           const refundLeft = isRefund ? t.amount - t.applied : 0;
-          const expandable = net && !t.pending && (returned || isRefund);
+          // Money in counted as income that may be a payback (Venmo, reimbursements): open it to match a purchase
+          const reviewable = net && !t.pending && !t.excluded && isReviewable(t);
+          const expandable = net && !t.pending && (returned || isRefund || reviewable);
           const isOpen = expandable && open.has(t.id);
 
           let amountCents = t.amount;
@@ -111,8 +113,9 @@ export default function TxnTable({ rows, matches, view, balances = {}, owedAccou
             if (returned) tags.push({ text: `returned ${money(t.refunded)}`, tone: "returned" });
             if (isRefund && !t.pending) {
               if (isPayback(t)) {
-                // Venmo/Zelle money back: someone paying you back, not a store refund awaiting a match
-                tags.push({ text: t.applied > 0 ? "payback · matched" : "payback", tone: "grey" });
+                // Someone paying you back (Venmo, Zelle) or a work reimbursement: not a store refund awaiting a match
+                const kind = isReimbursement(t) ? "reimbursement" : "payback";
+                tags.push({ text: t.applied > 0 ? `${kind} · matched` : kind, tone: "grey" });
               } else if (t.applied <= 0) {
                 tags.push({ text: "unmatched refund", tone: "open" });
               } else if (refundLeft <= 0) {
@@ -122,6 +125,7 @@ export default function TxnTable({ rows, matches, view, balances = {}, owedAccou
               }
             }
             if (t.flow === "transfer" && !t.excluded) tags.push({ text: t.amount > 0 ? "not income" : "not spending", tone: "grey" });
+            if (reviewable) tags.push({ text: "payback?", tone: "open" });
           }
 
           return (
@@ -210,6 +214,22 @@ function Originals({ t, links, refundLeft }: { t: TxnRow; links: MatchRow[]; ref
   const [linking, setLinking] = useState(false);
   const isPurchase = t.flow === "spend";
 
+  // Money in counted as income: match it to a purchase and it becomes a payback (not income).
+  if (t.flow === "income") {
+    return (
+      <div className="mb-3.5 ml-4 mr-4 rounded-lg border border-border bg-field px-3.5 py-1.5 md:ml-[122px] md:mr-5">
+        <div className="py-1.5 text-xs font-semibold text-muted-foreground">Counted as income. Paying you back for something?</div>
+        <Line date={t.date} desc={`${t.merchant || t.description}`} note="Money in" amount={`+${money(t.amount)}`} />
+        <div className="flex gap-4 border-t border-hairline pb-1.5 pt-2.5 text-[13px]">
+          <button type="button" className="text-primary hover:underline" onClick={() => setLinking(!linking)}>
+            Match {money(t.amount)} to a purchase
+          </button>
+        </div>
+        {linking && <Picker t={t} left={t.amount} payback />}
+      </div>
+    );
+  }
+
   async function unmatch(matchId: string) {
     setErr(null);
     try { await post("/api/refunds/unmatch", { matchId }); router.refresh(); }
@@ -264,7 +284,7 @@ interface Cand {
 }
 
 /** Pick the other side of a match. From a purchase: refunds with money left. From a refund: purchases. */
-function Picker({ t, left }: { t: TxnRow; left: number }) {
+function Picker({ t, left, payback = false }: { t: TxnRow; left: number; payback?: boolean }) {
   const router = useRouter();
   const isPurchase = t.flow === "spend";
   const [q, setQ] = useState("");
@@ -282,7 +302,8 @@ function Picker({ t, left }: { t: TxnRow; left: number }) {
   async function match(other: Cand) {
     setErr(null);
     try {
-      await post("/api/refunds/match", {
+      if (payback) await post("/api/refunds/payback", { txnId: t.id, purchaseId: other.id, amount: amounts[other.id] || undefined });
+      else await post("/api/refunds/match", {
         refundId: isPurchase ? other.id : t.id,
         purchaseId: isPurchase ? t.id : other.id,
         amount: amounts[other.id] || undefined,
@@ -294,7 +315,9 @@ function Picker({ t, left }: { t: TxnRow; left: number }) {
   if (cands === null) {
     return (
       <div className="flex flex-wrap items-center gap-2 pb-2">
-        <Button size="sm" variant="outline" onClick={() => load("")}>Show same-merchant {isPurchase ? "refunds" : "purchases"}</Button>
+        <Button size="sm" variant="outline" onClick={() => load("")}>
+          {payback ? "Show purchases around this date" : `Show same-merchant ${isPurchase ? "refunds" : "purchases"}`}
+        </Button>
         <span className="text-xs text-muted-foreground">or</span>
         <Input className="h-8 w-56 bg-card" placeholder={`search any ${isPurchase ? "refund" : "purchase"}…`} value={q}
           onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); load(); } }} />

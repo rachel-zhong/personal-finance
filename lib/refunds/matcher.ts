@@ -19,7 +19,11 @@ export const MATCH_GRACE_DAYS = 3;
 /** Payment apps: the same "merchant" covers many different people, so never auto-match on name. */
 export const P2P_MERCHANTS = ["venmo", "zelle", "paypal", "cash app", "square cash", "apple cash"];
 const P2P_SQL = `(${P2P_MERCHANTS.map((m) => `'${m}'`).join(", ")})`;
-const P2P_LIKE = P2P_MERCHANTS.map((m) => `merchant_norm LIKE '${m}%'`).join(" OR ");
+// Work reimbursements share a name with the employer's other money (and even its marketplace), so never auto-match them either.
+const P2P_LIKE = [...P2P_MERCHANTS.map((m) => `merchant_norm LIKE '${m}%'`),
+  "merchant_norm LIKE '%expensify%'", "merchant_norm LIKE '%reimb%'", "merchant_norm LIKE '%concur%'", "merchant_norm LIKE '%navan%'"].join(" OR ");
+/** Paybacks and reimbursements: what they pay back is a purchase near that date, at any merchant. */
+const isPaybackName = (mn: string | null) => !!mn && (P2P_MERCHANTS.some((m) => mn.startsWith(m)) || /expensify|reimb|concur|navan|atm|fin ctr|p2p|deposit/.test(mn));
 
 interface TxnRow {
   id: string;
@@ -172,12 +176,29 @@ export async function manualMatch(db: Db, refundId: string, purchaseId: string, 
 
 /** Purchases a refund could be applied to: same merchant first, then anything matching the search text. */
 export async function candidatePurchases(db: Db, refundId: string, search?: string) {
-  const r = await db.get<{ date: string; merchant_key: string }>(
-    "SELECT date, merchant_key FROM transactions WHERE id = ?",
+  const r = await db.get<{ date: string; merchant_key: string; merchant_norm: string | null }>(
+    "SELECT date, merchant_key, merchant_norm FROM transactions WHERE id = ?",
     [refundId],
   );
   if (!r) return [];
   const like = search ? `%${search.toLowerCase()}%` : null;
+  if (!like && isPaybackName(r.merchant_norm)) {
+    // A payback: purchases from 45 days before to a few days after, any merchant, closest date first.
+    return db.all<{
+      id: string; date: string; merchant: string | null; description: string | null;
+      gross: number; remaining: number; account_name: string; same_merchant: number;
+    }>(
+      `SELECT p.id, p.date, p.merchant, p.description, -p.amount AS gross,
+              -p.amount - COALESCE((SELECT SUM(amount_applied) FROM refund_matches m WHERE m.purchase_id = p.id AND m.refund_id <> ?), 0) AS remaining,
+              COALESCE(a.display_name, a.name) AS account_name, 0 AS same_merchant
+         FROM transactions p JOIN accounts a ON a.id = p.account_id
+        WHERE p.flow = 'spend' AND p.removed = 0 AND p.date BETWEEN ? AND ?
+          AND NOT (${P2P_LIKE.replace(/merchant_norm/g, "p.merchant_norm")})
+        ORDER BY ABS(julianday(p.date) - julianday(?)), p.amount
+        LIMIT 50`,
+      [refundId, shiftDate(r.date, -45), shiftDate(r.date, 3), r.date],
+    );
+  }
   return db.all<{
     id: string; date: string; merchant: string | null; description: string | null;
     gross: number; remaining: number; account_name: string; same_merchant: number;

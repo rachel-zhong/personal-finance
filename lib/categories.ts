@@ -88,5 +88,19 @@ export function categoryForFlow(mapped: string | null, flow: Flow): string {
 
 /** Payment apps: money back through these is someone paying you back, not a store refund. */
 export const P2P_TEXT = /\b(venmo|zelle|paypal|cash app|square cash|apple cash)\b/i;
-export const isPayback = (t: { flow: string; merchant: string | null; description: string | null }) =>
-  t.flow === "refund" && P2P_TEXT.test(`${t.merchant ?? ""} ${t.description ?? ""}`);
+/** Expense-report payouts: your employer paying back work costs. */
+export const REIMB_TEXT = /\b(expensify|reimb\w*|concur|navan)\b/i;
+type Moneyback = { flow: string; merchant: string | null; description: string | null };
+export const isReimbursement = (t: Moneyback) => t.flow === "refund" && REIMB_TEXT.test(`${t.merchant ?? ""} ${t.description ?? ""}`);
+/**
+ * Money in that's counted as income but may not be: payment apps, work reimbursements, cash deposits.
+ * Listed under "Paybacks to review" so you can match it to a purchase (keep REVIEW_WORDS in step).
+ */
+export const REVIEW_WORDS = ["venmo", "zelle", "paypal", "cash app", "square cash", "apple cash", "expensify", "reimb", "concur", "navan", "atm", "fin ctr", "p2p", "mobile deposit"];
+const REVIEW_TEXT = new RegExp(REVIEW_WORDS.map((w) => w.replace(/ /g, "\\s")).join("|"), "i");
+export const isReviewable = (t: { flow: string; amount: number; merchant: string | null; description: string | null }) =>
+  t.flow === "income" && t.amount > 0 && REVIEW_TEXT.test(`${t.merchant ?? ""} ${t.description ?? ""}`);
+
+/** Money back that isn't a store refund: a friend paying you back, or a work reimbursement. */
+export const isPayback = (t: Moneyback) =>
+  t.flow === "refund" && (P2P_TEXT.test(`${t.merchant ?? ""} ${t.description ?? ""}`) || isReimbursement(t));

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export type TypeKey = "" | "in" | "out" | "refunds" | "unmatched";
+export type TypeKey = "" | "in" | "out" | "refunds" | "unmatched" | "review";
 
 export interface FilterState {
   q: string; account: string; range: string; from: string; to: string; min: string; max: string; view: "net" | "raw"; type: TypeKey;
@@ -13,6 +13,7 @@ export interface FilterState {
 export const TYPE_BUTTONS: { key: TypeKey; label: string }[] = [
   { key: "", label: "All" }, { key: "in", label: "In" }, { key: "out", label: "Out" },
   { key: "refunds", label: "Refunds" }, { key: "unmatched", label: "Unmatched refunds" },
+  { key: "review", label: "Paybacks to review" },
 ];
 
 const input = "h-10 rounded-lg border border-input bg-card px-2.5 text-sm";
@@ -23,7 +24,7 @@ const input = "h-10 rounded-lg border border-input bg-card px-2.5 text-sm";
  */
 export default function Filters({ initial, accounts, counts }: {
   initial: FilterState; accounts: { id: string; label: string }[];
-  counts: Record<"all" | "in" | "out" | "refunds" | "unmatched", number>;
+  counts: Record<"all" | "in" | "out" | "refunds" | "unmatched" | "review", number>;
 }) {
   const router = useRouter();
   const [f, setF] = useState(initial);

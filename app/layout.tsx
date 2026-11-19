@@ -5,6 +5,9 @@ import { cn } from "@/lib/utils";
 import AppSidebar from "@/components/app-sidebar";
 import TabBar from "@/components/tab-bar";
 import SyncButton from "@/components/SyncButton";
+import { HIDE_AMOUNTS_SCRIPT } from "@/components/privacy-toggle";
+import Link from "next/link";
+import { Landmark } from "lucide-react";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const grotesk = Space_Grotesk({ subsets: ["latin"], weight: ["500", "600", "700"], variable: "--font-grotesk" });
@@ -30,7 +33,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={cn("font-sans", inter.variable, grotesk.variable)}>
+    <html lang="en" className={cn("font-sans", inter.variable, grotesk.variable)} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: HIDE_AMOUNTS_SCRIPT }} />
+      </head>
       <body>
         <div className="flex min-h-screen bg-background text-foreground">
           <AppSidebar />
@@ -43,7 +49,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </div>
                 <span className="font-heading text-base font-bold">My Money</span>
               </div>
-              <SyncButton compact />
+              <div className="flex items-center gap-1">
+                {/* Connections lives here on phones; the tab bar has room for five tabs */}
+                <Link href="/connect" aria-label="Connections &amp; files" className="flex size-11 items-center justify-center rounded-lg text-ink-2 hover:bg-hairline">
+                  <Landmark className="size-5" aria-hidden="true" />
+                </Link>
+                <SyncButton compact />
+              </div>
             </header>
             <main className="flex w-full min-w-0 max-w-[1240px] flex-col gap-5 px-4 pb-[calc(88px+env(safe-area-inset-bottom))] pt-5 md:px-10 md:py-8 md:pb-12">
               {children}

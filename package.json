@@ -14,7 +14,9 @@
     "typecheck": "tsc --noEmit",
     "demo:seed": "tsx scripts/seed-demo.ts",
     "demo": "npm run demo:seed && NEXT_TELEMETRY_DISABLED=1 NEXT_DIST_DIR=.next-demo DATABASE_PATH=data/demo.db SECRETS_PATH=data/demo-secrets.json next dev -H 127.0.0.1 -p 3001",
-    "phone": "sh scripts/phone.sh"
+    "phone": "sh scripts/phone.sh",
+    "comp:import": "tsx scripts/compensation/import.ts",
+    "comp:check": "tsx scripts/compensation/check.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

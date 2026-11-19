@@ -95,11 +95,13 @@ export default function SetAside({ id, name, balance, held, mode, included }: {
   return (
     <div className="group/aside flex items-center gap-1.5">
       <div className="flex flex-col items-end">
-        {/* Always the real balance; the subtitle explains how much of it is yours. */}
-        <span className="text-right text-[15px] font-semibold">{dollars(balance)}</span>
+        {/* Main number is what's yours (matches the bank total above); the real balance moves to the small line. */}
+        <span className={cn("sensitive text-right text-[15px] font-semibold", shown > 0 && bal - shown <= 0 && "text-[#8A8A93]")}>
+          {dollars(shown > 0 ? bal - shown : balance)}
+        </span>
         {shown > 0 && (
-          <span className="text-xs text-muted-foreground">
-            {mode === "all" ? "All held for others" : `${dollars(shown)} held for others · ${dollars(bal - shown)} yours`}
+          <span className="text-right text-xs text-muted-foreground">
+            {mode === "all" || shown >= bal ? `All ${dollars(bal)} held for others` : `of ${dollars(bal)} · ${dollars(shown)} held for others`}
           </span>
         )}
       </div>

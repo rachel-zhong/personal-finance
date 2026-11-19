@@ -3,7 +3,7 @@ import { money } from "@/lib/format";
 
 /** Live totals for everything matching the current filters, with a one-line note on the view. */
 export default function SubtotalBar({ type, totals, truncated, viewNote }: {
-  type: "" | "in" | "out" | "refunds" | "unmatched";
+  type: "" | "in" | "out" | "refunds" | "unmatched" | "review";
   totals: { count: number; moneyIn: number; moneyOut: number; net: number };
   truncated: boolean;
   viewNote: string;

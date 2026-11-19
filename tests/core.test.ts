@@ -47,6 +47,8 @@ function fakePlaid(pages: SyncResponse[]): PlaidApi & { calls: number } {
       const idx = cursor ? Number(cursor.replace("c", "")) : 0;
       return pages[idx] ?? { added: [], modified: [], removed: [], next_cursor: cursor ?? "c0", has_more: false };
     },
+    async investmentsHoldingsGet() { return { holdings: [], securities: [] }; },
+    async investmentsTransactionsGet() { return { investment_transactions: [], securities: [], total_investment_transactions: 0 }; },
   };
   return api;
 }
@@ -540,3 +542,210 @@ describe("simplified categories (GL-3)", () => {
     expect(old.prepare("SELECT COUNT(*) AS n FROM category_migration_log WHERE old_category IN ('clothing','taxes')").get()).toEqual({ n: 2 });
   });
 });
+
+describe("investments (IN)", () => {
+  /** A brokerage connection with two accounts; holdings arrive only after investments are enabled. */
+  async function setupBroker() {
+    const base = fakePlaid([]);
+    const plaid: PlaidApi = {
+      ...base,
+      async accountsGet() {
+        return {
+          item: { item_id: "item-1", institution_id: "ins_b" },
+          accounts: [
+            { account_id: "acc-brk", name: "Individual", mask: "1111", type: "investment", subtype: "brokerage",
+              balances: { current: 1500, available: null, iso_currency_code: "USD" } },
+            { account_id: "acc-roth", name: "Roth IRA", mask: "2222", type: "investment", subtype: "roth",
+              balances: { current: 1000, available: null, iso_currency_code: "USD" } },
+          ],
+        };
+      },
+      async investmentsHoldingsGet() {
+        return {
+          securities: [
+            { security_id: "s-vti", name: "Vanguard Total Stock Market ETF", ticker_symbol: "VTI", type: "etf", close_price: 250, close_price_as_of: "2026-11-16" },
+            { security_id: "s-acme", name: "Acme Corp", ticker_symbol: "ACME", type: "equity", close_price: 50, close_price_as_of: "2026-11-16" },
+            { security_id: "s-mmf", name: "Money Market", ticker_symbol: null, type: "mutual fund", is_cash_equivalent: true, close_price: 1, close_price_as_of: null },
+          ],
+          holdings: [
+            { account_id: "acc-brk", security_id: "s-vti", quantity: 2, institution_price: 250, institution_value: 500, cost_basis: 400 },
+            { account_id: "acc-brk", security_id: "s-acme", quantity: 20, institution_price: 50, institution_value: 1000, cost_basis: null },
+            { account_id: "acc-roth", security_id: "s-vti", quantity: 3, institution_price: 250, institution_value: 750, cost_basis: 800 },
+            { account_id: "acc-roth", security_id: "s-mmf", quantity: 250, institution_price: 1, institution_value: 250, cost_basis: 250 },
+          ],
+        };
+      },
+      async investmentsTransactionsGet(_t, _s, _e, offset) {
+        const all = [
+          { investment_transaction_id: "i1", account_id: "acc-brk", security_id: "s-acme", date: "2026-03-01", name: "DIVIDEND ACME", quantity: 0, amount: -12.5, price: 0, fees: 0, type: "cash", subtype: "dividend" },
+          { investment_transaction_id: "i2", account_id: "acc-brk", security_id: "s-vti", date: "2026-04-01", name: "BUY VTI", quantity: 2, amount: 400, price: 200, fees: 0, type: "buy", subtype: "buy" },
+          { investment_transaction_id: "i3", account_id: "acc-brk", security_id: "s-acme", date: "2025-12-01", name: "DIVIDEND ACME", quantity: 0, amount: -10, price: 0, fees: 0, type: "cash", subtype: "qualified dividend" },
+        ];
+        // Two pages, to exercise pagination
+        return { investment_transactions: offset === 0 ? all.slice(0, 2) : all.slice(offset), securities: [], total_investment_transactions: all.length };
+      },
+    };
+    const connId = await linkNewItem(db, plaid, "public-x", { id: "ins_b", name: "Test Broker" });
+    return { plaid, connId };
+  }
+
+  it("never fetches holdings until investments are enabled for that connection", async () => {
+    const { investmentsHoldingsGet: _unused, ...rest } = await setupBroker().then((x) => x.plaid);
+    void _unused;
+    let called = 0;
+    await syncAll(db, { ...rest, async investmentsHoldingsGet() { called++; return { holdings: [], securities: [] }; } } as PlaidApi);
+    expect(called).toBe(0);
+    const { portfolio } = await import("@/lib/investments");
+    const lines = await portfolio(db);
+    // Each account is one line from its balance until holdings are shared
+    expect(lines.map((l) => [l.kind, l.value, l.note])).toEqual([
+      ["account", 150000, "Holdings not shared yet"], ["account", 100000, "Holdings not shared yet"],
+    ]);
+  });
+
+  it("syncs holdings and transactions, combines by ticker, and summarizes", async () => {
+    const { plaid, connId } = await setupBroker();
+    await db.run("UPDATE connections SET investments_enabled = 1 WHERE id = ?", [connId]);
+    const r = await syncAll(db, plaid);
+    expect(r.investments[0]).toMatchObject({ holdings: 4, transactions: 3 });
+    await syncAll(db, plaid); // twice: no duplicates
+    expect(await count("SELECT COUNT(*) AS n FROM investment_transactions")).toBe(3);
+    expect(await count("SELECT COUNT(*) AS n FROM holdings")).toBe(4);
+
+    const { portfolio, combine, investmentSummary, allocation, snapshotHoldings } = await import("@/lib/investments");
+    const lines = await portfolio(db);
+    const rows = combine(lines);
+    const vti = rows.find((x) => x.ticker === "VTI")!;
+    expect(vti).toMatchObject({ quantity: 5, value: 125000, costBasis: 120000, assetType: "funds" });
+    expect(vti.accounts).toHaveLength(2);
+    expect(rows.find((x) => x.name === "Money Market")!.assetType).toBe("cash");
+
+    const s = await investmentSummary(db, lines, "2026-11-17");
+    expect(s.total).toBe(250000);
+    expect(s.gain).toMatchObject({ amount: 125000 + 25000 - 120000 - 25000 }); // VTI +50 −50 → 0... plus mmf 0
+    expect(s.noBasisValue).toBe(100000); // ACME has no cost basis
+    expect(s.dividends).toBe(1250); // 2026 only
+    expect(s.change).toBeNull(); // no month-end snapshot yet
+
+    const tax = allocation(lines, (l) => l.taxType);
+    expect(tax).toEqual([{ key: "taxable", value: 150000, pct: 60 }, { key: "roth", value: 100000, pct: 40 }]);
+
+    // A month-end snapshot enables the change card
+    await snapshotHoldings(db, "2026-10-31");
+    await db.run("UPDATE holding_snapshots SET value = value - 1000 WHERE as_of = '2026-10-31' AND holding_key = 's-acme'");
+    const s2 = await investmentSummary(db, lines, "2026-11-17");
+    expect(s2.change).toMatchObject({ since: "2026-10-31", amount: 1000 });
+  });
+
+  it("manual accounts are one-line holdings with sensible defaults", async () => {
+    const { portfolio } = await import("@/lib/investments");
+    await addManualBalance(db, { accountName: "Treasury", type: "investment", asOf: "2026-11-01", balanceCents: 500000 });
+    await addManualBalance(db, { accountName: "Acme RSU", type: "investment", asOf: "2026-11-01", balanceCents: 300000 });
+    await addManualBalance(db, { accountName: "Old 401k", type: "investment", asOf: "2026-11-01", balanceCents: 200000 });
+    const lines = await portfolio(db);
+    const by = Object.fromEntries(lines.map((l) => [l.name, [l.assetType, l.taxType]]));
+    expect(by).toEqual({ Treasury: ["bonds", "taxable"], "Acme RSU": ["stocks", "taxable"], "Old 401k": ["funds", "traditional"] });
+  });
+
+  it("classifies what brokers actually send: crypto, in-plan funds, placeholder tickers", async () => {
+    const { assetTypeFor, realTicker } = await import("@/lib/investments");
+    expect(assetTypeFor({ type: "cryptocurrency", is_cash_equivalent: 1 })).toBe("crypto");
+    expect(assetTypeFor({ type: "equity", ticker: "TARGETCO.RETIRE.2060", name: "Example Target 2060" })).toBe("funds");
+    expect(assetTypeFor({ type: "equity", ticker: "ACME", name: "Acme Trust Holdings" })).toBe("stocks");
+    expect(assetTypeFor({ type: "mutual fund", is_cash_equivalent: 1 })).toBe("cash");
+    expect([realTicker("vti"), realTicker("BRK.B"), realTicker("CUR:USD"), realTicker("TARGETCO.RETIRE.2060")]).toEqual(["VTI", "BRK.B", null, null]);
+  });
+
+  it("shows the gap between balance and listed holdings as cash", async () => {
+    const { plaid, connId } = await setupBroker();
+    await db.run("UPDATE connections SET investments_enabled = 1 WHERE id = ?", [connId]);
+    await syncAll(db, { ...plaid, async accountsGet() {
+      const r = await plaid.accountsGet("x");
+      r.accounts[1].balances.current = 1300; // Roth holdings add to $1,000; $300 is uninvested cash
+      return r;
+    } });
+    const { portfolio, investmentSummary } = await import("@/lib/investments");
+    const lines = await portfolio(db);
+    const cash = lines.filter((l) => l.name === "Cash" && l.taxType === "roth");
+    expect(cash.map((l) => l.value)).toEqual([30000]);
+    expect((await investmentSummary(db, lines, "2026-11-17")).total).toBe(280000);
+  });
+
+  it("manual holdings live inside manual accounts; the rest of the balance stays one line", async () => {
+    const { portfolio, saveManualHolding, deleteManualHolding } = await import("@/lib/investments");
+    const rsu = await addManualBalance(db, { accountName: "Acme RSU", type: "investment", asOf: "2026-11-01", balanceCents: 300000 });
+    const id = await saveManualHolding(db, { accountId: rsu, name: "Acme Corp", ticker: "acme", quantity: 40, valueCents: 200000, assetType: "stocks" });
+    let lines = await portfolio(db);
+    expect(lines.map((l) => [l.name, l.ticker, l.value, l.price])).toEqual([
+      ["Acme Corp", "ACME", 200000, 50], ["Acme RSU (rest)", null, 100000, null],
+    ]);
+    await deleteManualHolding(db, id);
+    lines = await portfolio(db);
+    expect(lines.map((l) => l.name)).toEqual(["Acme RSU"]);
+
+    const plaidAcct = await upsertAccount(db, { source: "plaid", externalId: "b1", institutionId: null, connectionId: null,
+      name: "Brokerage", type: "investment", subtype: "brokerage", mask: null, currency: "USD" });
+    await expect(saveManualHolding(db, { accountId: plaidAcct, name: "X", valueCents: 1, assetType: "stocks" })).rejects.toThrow(/by hand/);
+  });
+
+  it("value over time waits for the 3rd quarter-end of real snapshots", async () => {
+    const { investmentQuarters, snapshotHoldings } = await import("@/lib/investments");
+    await addManualBalance(db, { accountName: "Treasury", type: "investment", asOf: "2026-11-01", balanceCents: 100000 });
+    await snapshotHoldings(db, "2026-11-17");
+    expect(await investmentQuarters(db, "2026-11-18")).toEqual({ points: [], appearsOn: "2027-06-30" });
+    for (const d of ["2026-12-31", "2027-03-29", "2027-06-30"]) await snapshotHoldings(db, d);
+    const q = await investmentQuarters(db, "2027-07-02");
+    expect(q.points.map((p) => p.date)).toEqual(["2026-12-31", "2027-03-31", "2027-06-30"]);
+  });
+
+  it("sorts broker activity into the filter types", async () => {
+    const { activityKind } = await import("@/lib/investments");
+    expect([
+      activityKind("buy", "dividend reinvestment"), activityKind("sell", "sell"), activityKind("cash", "qualified dividend"),
+      activityKind("transfer", "transfer"), activityKind("cash", "contribution"), activityKind("fee", "management fee"), activityKind("cash", "interest"),
+    ]).toEqual(["buy", "sell", "dividend", "contribution", "contribution", "fee", "other"]);
+  });
+
+  it("weekly values: last saved value each week, gaps stay empty", async () => {
+    const { weeklyValues, weekEndOf, snapshotHoldings } = await import("@/lib/investments");
+    expect(weekEndOf("2026-11-17")).toBe("2026-11-22"); // Tuesday → Sunday
+    expect(weekEndOf("2026-11-22")).toBe("2026-11-22");
+    await addManualBalance(db, { accountName: "Treasury", type: "investment", asOf: "2026-11-01", balanceCents: 100000 });
+    await snapshotHoldings(db, "2026-11-17");
+    await addManualBalance(db, { accountName: "Treasury", type: "investment", asOf: "2026-11-18", balanceCents: 110000 });
+    await snapshotHoldings(db, "2026-11-19");
+    await snapshotHoldings(db, "2026-12-03");
+    const w = await weeklyValues(db, "2026-12-03");
+    expect(w).toEqual([
+      { weekEnd: "2026-11-22", date: "2026-11-19", value: 110000 },
+      { weekEnd: "2026-11-29", date: null, value: null },
+      { weekEnd: "2026-12-06", date: "2026-12-03", value: 110000 },
+    ]);
+  });
+});
+
+describe("paybacks (money in that isn't income)", () => {
+  it("matching Venmo money in to a dinner makes it a dining payback, linked, and no longer income", async () => {
+    const { matchPayback } = await import("@/lib/category-edits");
+    const { refreshDerived } = await import("@/lib/store");
+    const { isReviewable } = await import("@/lib/categories");
+    const inst = await upsertInstitution(db, { source: "csv", externalId: "x", name: "X" });
+    const chk = await upsertAccount(db, { source: "csv", externalId: "chk", institutionId: inst, name: "Checking", type: "depository" });
+    const card = await upsertAccount(db, { source: "csv", externalId: "card", institutionId: inst, name: "Card", type: "credit" });
+    await upsertTransaction(db, { accountId: card, accountType: "credit", source: "csv", externalId: "dinner", date: "2026-06-10",
+      amount: -12000, merchant: "Corner Bistro", description: "Corner Bistro", category: "FOOD_AND_DRINK", pending: false, raw: null });
+    await upsertTransaction(db, { accountId: chk, accountType: "depository", source: "csv", externalId: "vm", date: "2026-06-12",
+      amount: 4000, merchant: "Venmo", description: "Venmo", category: null, pending: false, raw: null });
+    await refreshDerived(db);
+    const row = async (ext: string) => (await db.get<{ id: string; flow: string; app_category: string; amount: number; merchant: string; description: string }>(
+      "SELECT id, flow, app_category, amount, merchant, description FROM transactions WHERE external_id = ?", [ext]))!;
+    const vm = await row("vm");
+    expect(vm.flow).toBe("income");
+    expect(isReviewable(vm)).toBe(true);
+    await matchPayback(db, vm.id, (await row("dinner")).id);
+    expect(await row("vm")).toMatchObject({ flow: "refund", app_category: "dining" });
+    expect(await count("SELECT COUNT(*) AS n FROM refund_matches")).toBe(1);
+    expect(await count("SELECT COUNT(*) AS n FROM transactions WHERE flow = 'income'")).toBe(0);
+  });
+});
+

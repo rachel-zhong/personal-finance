@@ -1,5 +1,6 @@
 /** Read-side queries for the dashboard. */
 import { Db } from "./db";
+import { REVIEW_WORDS } from "./categories";
 
 export const LIABILITY_TYPES = new Set(["credit", "loan"]);
 
@@ -112,13 +113,18 @@ export interface TxnFilters {
   max?: number;
   q?: string;
   dir?: "in" | "out"; // money in (amount > 0) or money out (amount < 0); credit card payments are left out
-  type?: "refunds" | "unmatched"; // refunds (not payment-app paybacks), or only those still to match
+  type?: "refunds" | "unmatched" | "review"; // refunds (not paybacks), only those still to match, or money in to review as paybacks
   cat?: string; // app category key
   spendingOnly?: boolean; // only rows that count in spending (purchases and refunds)
   ids?: string[]; // only these transactions
 }
 
-const P2P_SQL = ["venmo", "zelle", "paypal", "cash app", "square cash", "apple cash"]
+// Paybacks and work reimbursements (same words as P2P_TEXT and REIMB_TEXT in lib/categories.ts)
+const P2P_SQL = ["venmo", "zelle", "paypal", "cash app", "square cash", "apple cash", "expensify", "reimb", "concur", "navan"]
+  .map((w) => `LOWER(COALESCE(t.merchant,'') || ' ' || COALESCE(t.description,'')) LIKE '%${w}%'`).join(" OR ");
+
+// Money in counted as income that may really be a payback, reimbursement or your own cash (REVIEW_WORDS in lib/categories.ts)
+const REVIEW_SQL = REVIEW_WORDS
   .map((w) => `LOWER(COALESCE(t.merchant,'') || ' ' || COALESCE(t.description,'')) LIKE '%${w}%'`).join(" OR ");
 
 /** How many transactions each type button would show under the other filters (type and direction ignored). */
@@ -130,7 +136,7 @@ export async function txnTypeCounts(db: Db, f: TxnFilters) {
   };
   return {
     all: await count({}), in: await count({ dir: "in" }), out: await count({ dir: "out" }),
-    refunds: await count({ type: "refunds" }), unmatched: await count({ type: "unmatched" }),
+    refunds: await count({ type: "refunds" }), unmatched: await count({ type: "unmatched" }), review: await count({ type: "review" }),
   };
 }
 
@@ -144,7 +150,9 @@ function txnWhere(f: TxnFilters) {
   if (f.max != null && !Number.isNaN(f.max)) { where.push("ABS(t.amount) <= ?"); params.push(Math.round(f.max * 100)); }
   if (f.dir === "in") where.push("t.amount > 0 AND COALESCE(t.app_category, '') <> 'card_payment'");
   if (f.dir === "out") where.push("t.amount < 0 AND COALESCE(t.app_category, '') <> 'card_payment'");
-  if (f.type) {
+  if (f.type === "review") {
+    where.push(`t.flow = 'income' AND t.amount > 0 AND (${REVIEW_SQL})`);
+  } else if (f.type) {
     // Venmo, Zelle etc. paying you back isn't a store refund (same rule as isPayback in lib/categories.ts)
     where.push(`t.flow = 'refund' AND NOT (${P2P_SQL})`);
     if (f.type === "unmatched") where.push("t.amount - COALESCE((SELECT applied FROM refund_applied WHERE refund_id = t.id), 0) > 0");
@@ -389,6 +397,18 @@ export async function categoryDetail(db: Db, month: string) {
  * Income per month: paychecks, interest, dividends (flow = income). Transfers between your own
  * accounts aren't income. Leaves out accounts excluded from spending or held entirely for others.
  */
+/** Interest received per month (part of income, shown separately). */
+export async function monthlyInterest(db: Db) {
+  return db.all<{ month: string; interest: number }>(
+    `SELECT substr(t.date, 1, 7) AS month, SUM(t.amount) AS interest
+       FROM transactions t JOIN accounts a ON a.id = t.account_id
+      WHERE t.flow = 'income' AND t.removed = 0 AND t.amount > 0
+        AND a.include_in_spending = 1 AND a.net_worth_held_mode <> 'all'
+        AND LOWER(COALESCE(t.merchant,'') || ' ' || COALESCE(t.description,'')) LIKE '%interest%'
+      GROUP BY substr(t.date, 1, 7)`,
+  );
+}
+
 export async function monthlyIncome(db: Db) {
   return db.all<{ month: string; income: number }>(
     `SELECT substr(t.date, 1, 7) AS month, SUM(t.amount) AS income

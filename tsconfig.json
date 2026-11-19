@@ -32,9 +32,10 @@
     "**/*.ts",
     "**/*.tsx",
     ".next-demo/types/**/*.ts",
+    ".next-phone/types/**/*.ts",
     ".next/types/**/*.ts",
     "next-env.d.ts",
-    ".next-phone/types/**/*.ts"
+    ".next-check/types/**/*.ts"
   ],
   "exclude": [
     ".next-demo",

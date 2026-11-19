@@ -56,7 +56,7 @@ export default function OverviewExplorer({ cards, groups, recent }: { cards: Sum
               </span>
               <span className="flex min-w-0 flex-col gap-1">
                 <span className="text-[13px] text-muted-foreground">{c.label}</span>
-                <span className="font-heading text-[26px] font-semibold">{c.value}</span>
+                <span className="sensitive font-heading text-[26px] font-semibold">{c.value}</span>
                 <span className="text-xs text-muted-foreground">{c.note}</span>
               </span>
             </button>

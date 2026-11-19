@@ -1,14 +1,14 @@
 "use client";
 import { useMemo, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { categoryLabel, isPayback } from "@/lib/categories";
+import { categoryLabel, isPayback, isReviewable } from "@/lib/categories";
 import { dollars, money } from "@/lib/format";
 import type { MatchRow, TxnRow } from "@/lib/queries";
 import TxnTable, { TxnSort } from "../TxnTable";
 
 export interface CategoryBar { category: string; net: number; purchases: number; returned: number }
 
-type TypeFilter = "all" | "in" | "out" | "returns" | "unmatched";
+type TypeFilter = "all" | "in" | "out" | "returns" | "unmatched" | "review";
 
 // Card payments only move money between your own accounts, so they're left out of In and Out.
 const isCardPayment = (t: TxnRow) => t.category === "card_payment";
@@ -19,6 +19,7 @@ const TYPES: { key: TypeFilter; label: string; test: (t: TxnRow) => boolean }[] 
   { key: "out", label: "Out", test: (t) => t.amount < 0 && !isCardPayment(t) },
   { key: "returns", label: "Refunds", test: (t) => t.flow === "refund" && !isPayback(t) },
   { key: "unmatched", label: "Unmatched refunds", test: (t) => t.flow === "refund" && t.amount - t.applied > 0 && !isPayback(t) },
+  { key: "review", label: "Paybacks to review", test: (t) => !t.excluded && !t.pending && isReviewable(t) },
 ];
 
 const SORTS: { key: string; label: string; sort: TxnSort }[] = [
@@ -115,7 +116,7 @@ export default function MonthExplorer({ monthLabel, categories, rows, matches, t
           <span className="text-xs text-muted-foreground">
             {cats.size
               ? <button type="button" className="text-primary hover:underline" onClick={() => setCats(new Set())}>Show all categories</button>
-              : "Click categories to filter the transactions below"}
+              : "Click to filter transactions"}
           </span>
         </div>
         {!categories.length && <p className="text-sm text-muted-foreground">No spending this month.</p>}
@@ -155,7 +156,7 @@ export default function MonthExplorer({ monthLabel, categories, rows, matches, t
                 ? type === "unmatched" ? `${money(visible.reduce((t, r) => t + Math.max(0, r.amount - r.applied), 0))} still to match` : `${money(totalReturned)} returned in ${monthLabel}`
                 : type === "in" ? `+${money(moneyIn)} in`
                 : type === "out" ? `${money(moneyOut)} out`
-                : `${money(totalNet)} net spending`}{truncated ? " · newest 1,000 loaded" : ""} · use ⋯ on a row to exclude it
+                : `${money(totalNet)} spending`}{truncated ? " · newest 1,000 loaded" : ""}
             </p>
           </div>
           <label className="flex items-center gap-1.5 text-[13px] font-semibold text-ink-2">

@@ -141,9 +141,13 @@ export default function AccountsPanel({ groups, className, filterLabel = null, o
 }
 
 function AccountRow({ a, nested = false }: { a: PanelAccount; nested?: boolean }) {
-  const on = a.included;
+  // Entirely held for others: none of it is yours, so the row is greyed like a hidden account.
+  const allHeld = a.canSetAside && (a.balance ?? 0) > 0 &&
+    (a.heldMode === "all" || a.heldForOthers >= (a.balance ?? 0));
+  const on = a.included && !allHeld;
   return (
-    <div className={cn("flex flex-wrap items-center gap-3", nested ? "py-2" : "border-b border-hairline py-3")}>
+    <div className={cn("flex flex-wrap items-center gap-3", nested ? "py-2" : "border-b border-hairline py-3",
+      allHeld && "-mx-2 rounded-md bg-hairline/60 px-2")}>
       <div className="flex min-w-0 flex-[1_1_220px] flex-col gap-0.5">
         <Link href={`/accounts/${a.id}`} className={cn("tight font-medium no-underline hover:underline", nested ? "text-sm" : "text-[15px]",
           on ? "text-foreground hover:text-foreground" : "text-[#8A8A93] hover:text-[#8A8A93]")}>
