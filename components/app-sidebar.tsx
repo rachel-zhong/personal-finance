@@ -3,7 +3,7 @@ import { syncedLabel } from "@/lib/format";
 import NavLinks from "./nav-links";
 import SyncButton from "./SyncButton";
 
-export default async function AppSidebar() {
+export default async function AppSidebar({ showPay = true }: { showPay?: boolean }) {
   const db = getDb();
   const s = await db.get<{ last: string | null; n: number }>(
     "SELECT MAX(last_synced_at) AS last, COUNT(*) AS n FROM connections",
@@ -17,7 +17,7 @@ export default async function AppSidebar() {
         </div>
         <span className="font-heading text-lg font-bold">My Money</span>
       </div>
-      <NavLinks />
+      <NavLinks showPay={showPay} />
       <div className="mt-auto flex flex-col gap-3 text-xs leading-normal text-muted-foreground">
         <div>
           {s?.last ? `Last synced ${syncedLabel(s.last)}` : "Not synced yet"}

@@ -5,6 +5,8 @@ import { plaidEnv } from "@/lib/connectors/plaid/client";
 import PlaidLinkButton from "@/components/PlaidLinkButton";
 import { investmentConnections } from "@/lib/investments";
 import PayUpload from "@/components/files/pay-upload";
+import LogoutButton from "@/components/logout-button";
+import { authEnabled, payUploadsEnabled } from "@/lib/hosted";
 
 export const dynamic = "force-dynamic";
 
@@ -37,7 +39,7 @@ export default async function ConnectPage() {
         <PlaidLinkButton />
       </section>
 
-      <section aria-label="Pay documents" className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5">
+      {payUploadsEnabled() && <section aria-label="Pay documents" className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5">
         <div>
           <h2 className="text-base font-semibold">Pay documents</h2>
           <p className="mt-0.5 text-xs text-muted-foreground">
@@ -45,7 +47,7 @@ export default async function ConnectPage() {
           </p>
         </div>
         <PayUpload />
-      </section>
+      </section>}
 
       <section className="flex flex-col rounded-xl border border-border bg-card px-5 py-4">
         <h2 className="pb-2 text-base font-semibold">Connected</h2>
@@ -76,6 +78,14 @@ export default async function ConnectPage() {
           </div>
         ))}
       </section>
+
+      {authEnabled() && (
+        <section aria-label="Login" className="flex flex-col gap-2 rounded-xl border border-border bg-card p-5">
+          <h2 className="text-base font-semibold">Login</h2>
+          <p className="text-xs text-muted-foreground">You stay signed in for 30 days on each device. Changing the password on Railway signs every device out.</p>
+          <LogoutButton />
+        </section>
+      )}
     </>
   );
 }

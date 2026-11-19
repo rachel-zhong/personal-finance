@@ -14,7 +14,7 @@ interface SecretEntry {
 }
 type SecretFile = Record<string, SecretEntry>;
 
-function secretsPath() {
+export function secretsPath() {
   return process.env.SECRETS_PATH || path.join(process.cwd(), "secrets", "plaid-tokens.json");
 }
 

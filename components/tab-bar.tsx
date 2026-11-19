@@ -13,13 +13,14 @@ const TABS = [
 ];
 
 /** Phone navigation: fixed to the bottom, clear of the iPhone home indicator. Hidden from 768px up (the sidebar takes over). */
-export default function TabBar() {
+export default function TabBar({ showPay = true }: { showPay?: boolean }) {
   const path = usePathname();
+  const tabs = showPay ? TABS : TABS.filter((t) => t.href !== "/compensation");
   const active = (href: string) => (href === "/" ? path === "/" || path.startsWith("/accounts") : path.startsWith(href));
   return (
     <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
-      <div className="mx-auto grid max-w-lg grid-cols-5">
-        {TABS.map(({ href, label, Icon }) => {
+      <div className={cn("mx-auto grid max-w-lg", tabs.length === 5 ? "grid-cols-5" : "grid-cols-4")}>
+        {tabs.map(({ href, label, Icon }) => {
           const on = active(href);
           return (
             <Link key={href} href={href} aria-current={on ? "page" : undefined}

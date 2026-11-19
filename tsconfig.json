@@ -35,10 +35,12 @@
     ".next-phone/types/**/*.ts",
     ".next/types/**/*.ts",
     "next-env.d.ts",
-    ".next-check/types/**/*.ts"
+    ".next-check/types/**/*.ts",
+    ".next-hosted/types/**/*.ts"
   ],
   "exclude": [
     ".next-demo",
+    ".next-hosted",
     "node_modules"
   ]
 }

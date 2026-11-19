@@ -521,4 +521,18 @@ CREATE TABLE comp_rsu_vests (
 );
 `,
   },
+  {
+    id: 12,
+    name: "login throttle for the hosted app",
+    sql: `
+-- One row (id = 1). Wrong passwords in a row, when the lock ends, and the last authenticator step used (no replays).
+CREATE TABLE auth_throttle (
+  id           INTEGER PRIMARY KEY CHECK (id = 1),
+  failures     INTEGER NOT NULL DEFAULT 0,
+  locked_until TEXT,
+  last_totp_step INTEGER
+);
+INSERT INTO auth_throttle (id, failures) VALUES (1, 0);
+`,
+  },
 ];

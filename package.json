@@ -16,7 +16,10 @@
     "demo": "npm run demo:seed && NEXT_TELEMETRY_DISABLED=1 NEXT_DIST_DIR=.next-demo DATABASE_PATH=data/demo.db SECRETS_PATH=data/demo-secrets.json next dev -H 127.0.0.1 -p 3001",
     "phone": "sh scripts/phone.sh",
     "comp:import": "tsx scripts/compensation/import.ts",
-    "comp:check": "tsx scripts/compensation/check.ts"
+    "comp:check": "tsx scripts/compensation/check.ts",
+    "start:hosted": "NEXT_TELEMETRY_DISABLED=1 next start -H 0.0.0.0 -p ${PORT:-3000}",
+    "hosted:upload": "tsx scripts/hosted/upload.ts",
+    "hosted:authenticator": "tsx scripts/hosted/authenticator.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
@@ -43,5 +46,8 @@
     "tsx": "^4.23.15",
     "typescript": "^5.9.3",
     "vitest": "^5.1.0"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }

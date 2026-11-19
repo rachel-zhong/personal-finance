@@ -8,6 +8,8 @@ import SyncButton from "@/components/SyncButton";
 import { HIDE_AMOUNTS_SCRIPT } from "@/components/privacy-toggle";
 import Link from "next/link";
 import { Landmark } from "lucide-react";
+import { headers } from "next/headers";
+import { compensationEnabled } from "@/lib/hosted";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const grotesk = Space_Grotesk({ subsets: ["latin"], weight: ["500", "600", "700"], variable: "--font-grotesk" });
@@ -31,7 +33,17 @@ export const viewport: Viewport = {
   themeColor: "#0F6B5C",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const path = (await headers()).get("x-mm-path") ?? "";
+  const showPay = compensationEnabled();
+  // The login page shows nothing of the app (no navigation, no sync time) until you're signed in.
+  if (path === "/login") {
+    return (
+      <html lang="en" className={cn("font-sans", inter.variable, grotesk.variable)} suppressHydrationWarning>
+        <body className="bg-background px-4 text-foreground">{children}</body>
+      </html>
+    );
+  }
   return (
     <html lang="en" className={cn("font-sans", inter.variable, grotesk.variable)} suppressHydrationWarning>
       <head>
@@ -39,7 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <div className="flex min-h-screen bg-background text-foreground">
-          <AppSidebar />
+          <AppSidebar showPay={showPay} />
           <div className="flex min-w-0 flex-1 flex-col">
             {/* Phone header: logo and Sync now (the sidebar is hidden under 768px) */}
             <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-border bg-background/95 px-4 pb-2 pt-[calc(env(safe-area-inset-top)+8px)] backdrop-blur md:hidden">
@@ -62,7 +74,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </main>
           </div>
         </div>
-        <TabBar />
+        <TabBar showPay={showPay} />
       </body>
     </html>
   );

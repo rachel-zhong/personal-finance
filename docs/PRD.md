@@ -23,6 +23,7 @@ This is the single source of truth. It describes what the app does today, tab by
 11. [Known limits](#11-known-limits)
 12. [Decisions log](#12-decisions-log)
 13. [Not built yet](#13-not-built-yet)
+14. [Hosting online](#14-hosting-online-hs)
 
 ---
 
@@ -650,3 +651,26 @@ Data sources, not app bugs.
 | CP-16 | Edit or add base pay rows in the app. | P1 |
 | CP-17 | Bank cross-check of deposits shown in the app. | P1 |
 | CP-18 | Data checks panel in the app. | P1 |
+
+---
+
+## 14. Hosting online (HS)
+
+The same code runs on a server (Railway) for phone access from anywhere. Setup steps: [hosting-railway.md](hosting-railway.md).
+
+| ID | Requirement | Details |
+|---|---|---|
+| HS-1 | **Login** | On whenever `APP_PASSWORD` is set. Password compared as scrypt hashes in constant time. Optional authenticator code (`TOTP_SECRET`, RFC 6238, 30-second codes, one step of drift, each code works once). Wrong password or code gives the same message. |
+| HS-2 | **Session** | Signed cookie (HMAC-SHA256), HttpOnly, Secure on HTTPS, SameSite=Lax, 30 days. Changing `APP_PASSWORD` or `SESSION_SECRET` signs every device out. |
+| HS-3 | **Lockout** | 5 wrong tries in a row lock login for 15 minutes, app-wide (not per device). Count resets on success. Stored in `auth_throttle`. |
+| HS-4 | **Everything protected** | Middleware checks the session on every page and API. Public: login page and API, `/api/health`, manifest and icons. Pages redirect to login; APIs return 401. The login page shows nothing of the app. |
+| HS-5 | **Same-site check** | Data-changing API calls must come from the app's own address (request host, `RAILWAY_PUBLIC_DOMAIN` or `APP_DOMAIN`, or this Mac's Tailscale address). |
+| HS-6 | **Storage** | `DATABASE_PATH` and `SECRETS_PATH` point to a Railway volume (`/data`). Plaid keys come from variables. |
+| HS-7 | **One-time upload** | `npm run hosted:upload` copies the Mac's database (consistent copy), strips pay tables from the copy, logs in, and sends it with the tokens file. The server checks integrity, a token per connection, no pay data, upgrades the copy's schema, and only then swaps it in. Refuses to overwrite existing connections without `--replace`; keeps backups when replacing. |
+| HS-8 | **Pay data switch** | `HOSTED_INCLUDE_COMPENSATION` (default false). Off: no Compensation tab or route, and pay data is refused on upload. Pay document upload is Mac-only either way (needs PDFKit and Vision). |
+| HS-9 | **Daily sync** | Inside the app (no extra service): checks every 30 minutes and syncs once a day after `SYNC_HOUR` (default 6) in `TZ`, if nothing synced since. Sync now still works. |
+| HS-10 | **Bank sign-in return** | `/oauth` reopens Plaid Link with the saved token (`PLAID_REDIRECT_URI`) to finish OAuth banks on a phone. Update mode only. |
+| HS-11 | **Phone** | Manifest, icons and the bottom tab bar unchanged. Without Compensation the tab bar has 4 tabs. |
+
+- _Open:_ email one-time codes need an outside email service, so they aren't built. The authenticator code covers the second step.
+

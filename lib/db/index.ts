@@ -49,6 +49,9 @@ class SqliteDb implements Db {
       this.depth--;
     }
   }
+  close() {
+    this.conn.close();
+  }
   migrate() {
     this.conn.exec(
       "CREATE TABLE IF NOT EXISTS schema_migrations (id INTEGER PRIMARY KEY, name TEXT NOT NULL, applied_at TEXT NOT NULL)",
@@ -85,10 +88,21 @@ const g = globalThis as unknown as { __financeDb?: Db };
 /** Shared connection for the web server and CLI scripts. */
 export function getDb(): Db {
   if (!g.__financeDb) {
-    const file = process.env.DATABASE_PATH || path.join(process.cwd(), "data", "finance.db");
-    g.__financeDb = openSqlite(file);
+    g.__financeDb = openSqlite(dbPath());
   }
   return g.__financeDb;
+}
+
+/** The database file in use (DATABASE_PATH, or data/finance.db). */
+export function dbPath() {
+  return process.env.DATABASE_PATH || path.join(process.cwd(), "data", "finance.db");
+}
+
+/** Close the shared connection so the file can be replaced (data upload). The next getDb() reopens it. */
+export function closeDb() {
+  const d = g.__financeDb as unknown as { close?: () => void } | undefined;
+  d?.close?.();
+  g.__financeDb = undefined;
 }
 
 export const newId = () => randomUUID();

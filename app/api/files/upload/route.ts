@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { resequence } from "@/lib/compensation/store";
+import { payUploadsEnabled } from "@/lib/hosted";
 import { COMP_ROOT, PAYSTUB_DIR, importBasePayImage, importPdf, type ImportResult } from "@/lib/compensation/importer";
 
 export const runtime = "nodejs";
@@ -38,6 +39,8 @@ function describe(r: ImportResult): string {
  * and imported so the Compensation tab updates right away. Files that aren't a pay document are not kept.
  */
 export async function POST(req: Request) {
+  // Pay documents are read with Apple's PDFKit and Vision: only on your Mac, never on a server.
+  if (!payUploadsEnabled()) return NextResponse.json({ error: "Pay documents can only be added in the app on your Mac" }, { status: 403 });
   const form = await req.formData();
   const files = form.getAll("files").filter((f): f is File => f instanceof File);
   if (!files.length) return NextResponse.json({ error: "No files" }, { status: 400 });

@@ -132,4 +132,5 @@ npm run typecheck
 ```
 
 - Built with Next.js, TypeScript and SQLite. The Plaid client allows only four read-only endpoints (`lib/connectors/plaid/client.ts`).
+- Use it from your phone anywhere (Railway): [docs/hosting-railway.md](docs/hosting-railway.md).
 - Requirements and design decisions: [docs/PRD.md](docs/PRD.md) (every tab and how each number is calculated). Mockups: `design/`.

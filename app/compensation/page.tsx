@@ -1,5 +1,7 @@
 import PrivacyToggle from "@/components/privacy-toggle";
 import PayUpload from "@/components/files/pay-upload";
+import { notFound } from "next/navigation";
+import { compensationEnabled, payUploadsEnabled } from "@/lib/hosted";
 import Link from "next/link";
 import { getDb } from "@/lib/db";
 import { dollars, money, shortDate } from "@/lib/format";
@@ -83,6 +85,9 @@ function flow(sts: CompStatement[], key: string, label: string, title: string, r
 type SP = Promise<{ year?: string }>;
 
 export default async function CompensationPage({ searchParams }: { searchParams: SP }) {
+  // Hosted with HOSTED_INCLUDE_COMPENSATION off: the tab doesn't exist
+  if (!compensationEnabled()) notFound();
+  const uploads = payUploadsEnabled();
   const db = getDb();
   const today = new Date().toLocaleDateString("en-CA");
   const thisMonth = today.slice(0, 7);
@@ -94,8 +99,8 @@ export default async function CompensationPage({ searchParams }: { searchParams:
       <>
         <h1 className="text-[32px] font-semibold">Compensation</h1>
         <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5 text-sm text-ink-2">
-          No pay data yet. Add your pay statements and W-2s to get started.
-          <PayUpload />
+          No pay data yet.{" "}
+          {uploads ? <>Add your pay statements and W-2s to get started.<PayUpload /></> : "Add pay documents in the app on your Mac, then upload the data again."}
         </div>
       </>
     );
@@ -270,10 +275,12 @@ export default async function CompensationPage({ searchParams }: { searchParams:
       <RsuVests year={year} vests={vestDates} />
       <BasePayChart steps={toSteps(base)} today={today} />
 
-      <section aria-label="Add pay documents" className="flex flex-col gap-2 rounded-xl border border-border bg-card p-5">
-        <h2 className="text-base font-semibold">Add pay documents</h2>
-        <PayUpload compact />
-      </section>
+      {uploads && (
+        <section aria-label="Add pay documents" className="flex flex-col gap-2 rounded-xl border border-border bg-card p-5">
+          <h2 className="text-base font-semibold">Add pay documents</h2>
+          <PayUpload compact />
+        </section>
+      )}
     </>
   );
 }

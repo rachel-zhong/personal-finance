@@ -21,8 +21,9 @@ const MORE: NavItem[] = [
 export const isActive = (path: string, href: string) =>
   href === "/" ? path === "/" || path.startsWith("/accounts") : path.startsWith(href);
 
-export default function NavLinks() {
+export default function NavLinks({ showPay = true }: { showPay?: boolean }) {
   const path = usePathname();
+  const main = showPay ? MAIN : MAIN.filter((l) => l.href !== "/compensation");
   const item = ({ href, label, Icon }: NavItem) => {
     const on = isActive(path, href);
     return (
@@ -40,7 +41,7 @@ export default function NavLinks() {
   };
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-1">{MAIN.map(item)}</div>
+      <div className="flex flex-col gap-1">{main.map(item)}</div>
       <div className="flex flex-col gap-1 border-t border-border pt-4">
         <span className="px-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Data</span>
         {MORE.map(item)}
