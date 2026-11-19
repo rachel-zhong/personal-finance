@@ -431,14 +431,14 @@ gain %          = unrealized gain ÷ Σ cost basis (of those same holdings)
 |---|---|
 | Rows | One per security across accounts: holding, type, shares, price, value, % of total, cost basis, gain $ and %. Click a row to see which accounts hold it. Sortable; phone gets a sort picker. |
 | **Type filter** | One segmented control: All · Stocks · ETFs & funds · Bonds & Treasuries · Cash · Crypto, with counts. Labeled "Type". |
-| **Account filter** | Separate round chips, each with its value. Labeled "Account". Grouped (below). |
+| **Account filter** | Separate round chips with the account name only. Labeled "Account". Grouped (below). |
 | **Subtotal row** | Bottom of the table. Sums only what the filters show: value, % of total, cost basis, gain. Says "Total" with no filter, "Subtotal" with one. |
 
 **Account chip grouping**
 
 | Rule (checked in order) | Chip |
 |---|---|
-| Account worth under $25 | "Other" (always last) |
+| Account worth under $30 | "Other" (always last) |
 | Account you track by hand | "Tracked by hand" |
 | Taxable account at a broker that has another taxable account | One chip named after the broker (e.g. individual + crypto → "Schwab") |
 | Anything else | Its own chip (e.g. Roth IRA, 401(k)) |

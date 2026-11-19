@@ -128,7 +128,7 @@ export default function HoldingsTable({ lines, total, manualAccounts, manualHold
             <button type="button" aria-pressed={!account} onClick={() => setAccount(null)} className={chip(!account)}>All accounts</button>
             {accounts.map((a) => (
               <button key={a.key} type="button" aria-pressed={account === a.key} onClick={() => setAccount(account === a.key ? null : a.key)} className={chip(account === a.key)}>
-                {a.label} <span className="sensitive text-xs text-muted-foreground">{dollars(a.value)}</span>
+                {a.label}
               </button>
             ))}
           </div>

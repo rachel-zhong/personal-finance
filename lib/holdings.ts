@@ -34,13 +34,13 @@ export interface HoldingLine {
 
 export interface AccountFilter { key: string; label: string; value: number; accountIds: string[] }
 
-const SMALL_ACCOUNT = 2500; // cents: accounts under $25 go into "Other"
+const SMALL_ACCOUNT = 3000; // cents: accounts under $30 go into "Other"
 
 /**
  * Account filter buttons, merged so there are fewer of them:
  *  - every account you track by hand → "Tracked by hand"
  *  - taxable accounts at the same broker → one button named after the broker (e.g. Robinhood individual + crypto)
- *  - any account worth under $25 → "Other"
+ *  - any account worth under $30 → "Other"
  */
 export function accountFilters(lines: HoldingLine[]): AccountFilter[] {
   const byAcct = new Map<string, { name: string; inst: string | null; tax: TaxType; manual: boolean; value: number }>();
