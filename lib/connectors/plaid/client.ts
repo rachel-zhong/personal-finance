@@ -109,7 +109,11 @@ export interface PlaidApi {
     item: { item_id: string; institution_id?: string | null; institution_name?: string | null };
   }>;
   transactionsSync(accessToken: string, cursor: string | null): Promise<SyncResponse>;
-  investmentsHoldingsGet(accessToken: string): Promise<{ holdings: PlaidHolding[]; securities: PlaidSecurity[] }>;
+  investmentsHoldingsGet(accessToken: string): Promise<{
+    holdings: PlaidHolding[]; securities: PlaidSecurity[];
+    /** Fresh balances for the same accounts (newer than /accounts/get right after an investments refresh) */
+    accounts?: { account_id: string; balances: { current: number | null } }[];
+  }>;
   investmentsTransactionsGet(accessToken: string, startDate: string, endDate: string, offset: number): Promise<{
     investment_transactions: PlaidInvestmentTransaction[]; securities: PlaidSecurity[]; total_investment_transactions: number;
   }>;

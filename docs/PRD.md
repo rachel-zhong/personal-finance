@@ -190,7 +190,7 @@ Plus one row per unmatched refund: `net = −(refund − amount already applied)
 | Search | Empty | Any part of the name or description. |
 
 - Sorted closest to the transaction's date first (same merchant first when both show).
-- Hides payment-app purchases in "any merchant" mode, and purchases already fully refunded.
+- Hides purchases already fully refunded. Payment-app payments (e.g. Venmo for a dinner) are listed, since a friend may pay you back for them.
 - Up to 100 results. Each row has an amount box (defaults to what fits) and a Match button.
 - Matches can be undone.
 
@@ -369,7 +369,7 @@ The bank subtotal adds up the main numbers, so it always matches the rows.
 | IN-2 | **Holdings sync** | Each sync pulls holdings and securities, and 24 months of investment transactions (every time, because brokers backfill later). |
 | IN-3 | **Manual accounts** | A manual investment or retirement account shows as one holding with its balance. You can add holdings inside it by hand (name, ticker, shares, value, type); the rest of the balance stays as a "(rest)" line. |
 | IN-4 | **Daily snapshots** | Each sync saves today's value of every holding. A later sync the same day replaces it. Days without a sync are missing; nothing is back-filled. |
-| IN-5 | **Refresh now** | Button in the title row. Asks Plaid to fetch fresh data from each broker (`/investments/refresh`), waits 30 seconds, then reads holdings back. Manual only. |
+| IN-5 | **Refresh now** | Button in the title row. Asks Plaid to fetch fresh data from each broker (`/investments/refresh`), waits 30 seconds, then runs a full sync. Account balances from the holdings answer are saved, so Net worth and every tab update too. Manual only. |
 
 **How each holding line is built** (per account)
 

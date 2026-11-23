@@ -2,7 +2,7 @@ import { getDb } from "@/lib/db";
 import { handle } from "@/lib/api-util";
 import { getAccessToken } from "@/lib/secrets";
 import { createPlaidClient, PlaidError } from "@/lib/connectors/plaid/client";
-import { snapshotHoldings, syncInvestments } from "@/lib/investments";
+import { syncAll } from "@/lib/sync";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -12,7 +12,7 @@ const WAIT_MS = 30_000;
 
 /**
  * "Refresh now" on the Investments tab: asks Plaid to fetch fresh holdings from each broker (instead of waiting for its
- * daily pull), waits, then reads them back like a normal sync. Read-only. Free on the Plaid Trial plan; billed per call on
+ * daily pull), waits, then runs a full sync, so Net worth and every other tab update too. Read-only. Free on the Plaid Trial plan; billed per call on
  * paid plans, which is why the regular Sync never calls it.
  */
 export async function POST() {
@@ -33,12 +33,12 @@ export async function POST() {
       }
     }
     if (results.some((r) => r.refreshed)) await new Promise((r) => setTimeout(r, WAIT_MS));
+    // Then a full sync: balances, transactions, holdings, and the Net worth history, so every tab shows the fresh numbers.
+    const sync = await syncAll(db, plaid);
     for (const [i, c] of conns.entries()) {
-      const s = await syncInvestments(db, plaid, c.id);
-      results[i].holdings = s.holdings;
-      if (s.error) results[i].error = s.error;
+      const s = sync.investments.find((x) => x.connectionId === c.id);
+      if (s) { results[i].holdings = s.holdings; if (s.error) results[i].error = s.error; }
     }
-    await snapshotHoldings(db);
     return { results };
   });
 }

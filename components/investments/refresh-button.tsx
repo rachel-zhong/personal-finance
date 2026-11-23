@@ -29,7 +29,7 @@ export default function RefreshButton() {
     <div className="flex items-center gap-2 text-xs text-muted-foreground">
       {msg && <span className="max-w-[40vw] truncate">{msg}</span>}
       <button type="button" onClick={run} disabled={busy}
-        title="Ask Robinhood and Fidelity for their latest holdings now (takes about 30 seconds)"
+        title="Get the latest holdings and balances from your brokers, then update every tab (about a minute)"
         className="flex h-11 items-center gap-1.5 rounded-md border border-input bg-card px-3 text-[13px] font-semibold text-ink-2 hover:bg-hairline disabled:opacity-60 md:h-[34px]">
         <RefreshCw className={busy ? "size-4 animate-spin" : "size-4"} aria-hidden="true" />
         {busy ? "Refreshing…" : "Refresh now"}

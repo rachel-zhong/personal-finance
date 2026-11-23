@@ -212,7 +212,7 @@ export async function candidatePurchases(db: Db, refundId: string, f: CandidateF
       WHERE p.flow = 'spend' AND p.removed = 0 AND p.date BETWEEN ? AND ?
         -- fully refunded purchases can't take more (the current refund's own share doesn't count against it)
         AND -p.amount - COALESCE((SELECT SUM(amount_applied) FROM refund_matches m WHERE m.purchase_id = p.id AND m.refund_id <> ?), 0) > 0
-        ${merchant === "same" ? "AND p.merchant_key = ?" : `AND NOT (${P2P_LIKE.replace(/merchant_norm/g, "p.merchant_norm")})`}
+        ${merchant === "same" ? "AND p.merchant_key = ?" : ""}
         ${like ? "AND LOWER(COALESCE(p.merchant, '') || ' ' || COALESCE(p.description, '')) LIKE ?" : ""}
       ORDER BY ${merchant === "same" ? "" : "same_merchant DESC, "}ABS(julianday(p.date) - julianday(?)), p.amount
       LIMIT 100`,

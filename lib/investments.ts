@@ -6,6 +6,7 @@ import { Db, newId, nowIso, today } from "./db";
 import { getAccessToken } from "./secrets";
 import { PlaidApi, PlaidError, PlaidInvestmentTransaction, PlaidSecurity } from "./connectors/plaid/client";
 import { groupFor } from "./groups";
+import { upsertBalance } from "./store";
 import { accountLabel } from "./queries";
 import { monthEnd as monthEndOf, previousMonthEnds } from "./networth";
 import { shiftDate } from "./refunds/matcher";
@@ -108,6 +109,11 @@ export async function syncInvestments(db: Db, plaid: PlaidApi, connectionId: str
       const accts = new Map((await tx.all<{ id: string; external_id: string }>(
         "SELECT id, external_id FROM accounts WHERE connection_id = ?", [connectionId])).map((a) => [a.external_id, a.id]));
       await upsertSecurities(tx, secs);
+      // The holdings answer carries each account's balance too. Save it, so Net worth matches the holdings.
+      for (const a of h.accounts ?? []) {
+        const accountId = accts.get(a.account_id);
+        if (accountId && a.balances?.current != null) await upsertBalance(tx, accountId, end, toCents(a.balances.current));
+      }
       await tx.run(`DELETE FROM holdings WHERE account_id IN (SELECT id FROM accounts WHERE connection_id = ?)`, [connectionId]);
       for (const x of h.holdings) {
         const accountId = accts.get(x.account_id);
